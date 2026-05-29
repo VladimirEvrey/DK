@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Служба Цифровизации и Data EX</title>
+<title>Диаграмма Ганта</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Geologica:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
@@ -250,7 +250,7 @@ select:hover,select:focus{border-color:var(--accent);}
     <input type="file" id="fileInput" accept=".xlsx,.xls">
 
     <div class="gs-wrap">
-      <input type="text" id="gsUrl" placeholder="Ссылка на Google Таблицу…" autocomplete="off" spellcheck="false">
+      <input type="text" id="gsUrl" value="https://docs.google.com/spreadsheets/d/1fqgdfF8_w1XeSsYYmLAgYJ5MczJrqFlAY1MpEqnKIr0/edit?gid=0#gid=0" autocomplete="off" spellcheck="false">
       <button class="gs-btn" id="gsLoadBtn">↗ Загрузить</button>
     </div>
 
@@ -498,20 +498,22 @@ function populateFilters() {
   const dkSel = document.getElementById('dkFilter');
   dkSel.innerHTML = '<option value="">— Наименование ДК —</option>';
   dks.forEach(d => dkSel.innerHTML += `<option value="${d}">${d}</option>`);
+  // Сначала ставим значение, ПОТОМ updateStageFilter
   if (dks.length===1) dkSel.value = dks[0];
-
   dkSel.onchange = () => { updateStageFilter(); renderGantt(); };
   document.getElementById('stageFilter').onchange = renderGantt;
   document.getElementById('statusFilter').onchange = renderGantt;
-  updateStageFilter();
+  updateStageFilter(); // вызываем после dkSel.value
 }
 function updateStageFilter() {
   const dk = document.getElementById('dkFilter').value;
-  const filtered = dk ? allData.filter(r=>r.dk===dk) : allData;
-  const stages = [...new Set(filtered.map(r=>r.stage).filter(Boolean))];
+  const filtered = dk ? allData.filter(r => r.dk === dk) : allData;
+  const stages = [...new Set(filtered.map(r=>r.stage).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'ru'));
   const sel = document.getElementById('stageFilter');
+  const prev = sel.value;
   sel.innerHTML = '<option value="">Все этапы</option>';
   stages.forEach(s => sel.innerHTML += `<option value="${s}">${s}</option>`);
+  if (stages.includes(prev)) sel.value = prev;
 }
 function getFiltered() {
   const dk     = document.getElementById('dkFilter').value;
@@ -825,6 +827,33 @@ function moveTooltip(e) {
   tooltip.style.top  = Math.min(e.clientY-10, window.innerHeight-tooltip.offsetHeight-8)+'px';
 }
 function hideTooltip() { tooltip.style.display='none'; }
+
+// ─── АВТОЗАГРУЗКА ─────────────────────────────────────────────
+const HARDCODED_URL = 'https://docs.google.com/spreadsheets/d/1fqgdfF8_w1XeSsYYmLAgYJ5MczJrqFlAY1MpEqnKIr0/export?format=csv&gid=0';
+
+async function autoLoad() {
+  const btn = document.getElementById('gsLoadBtn');
+  btn.innerHTML = '<span class="spin"></span>';
+  btn.disabled = true;
+  try {
+    const resp = await fetch(HARDCODED_URL);
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
+    const text = await resp.text();
+    const rows = csvToRows(text);
+    if (!rows.length) throw new Error('Таблица пустая');
+    document.getElementById('uploadZone').style.display = 'none';
+    parseData(rows);
+  } catch(err) {
+    console.warn('Автозагрузка не удалась:', err.message);
+    // Не прячем upload zone — пользователь может загрузить вручную
+  } finally {
+    btn.innerHTML = '↗ Загрузить';
+    btn.disabled = false;
+  }
+}
+
+// Запускаем сразу при открытии страницы
+autoLoad();
 </script>
 </body>
 </html>
