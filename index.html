@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Enterprise Gantt</title>
+
+<style>
+:root{
+  --bg:#f4f7fb;
+  --border:#dbe4ef;
+  --text:#1e293b;
+  --muted:#64748b;
+  --blue:#3b82f6;
+  --green:#22c55e;
+  --orange:#f59e0b;
+  --red:#ef4444;
+  --purple:#9333ea;
+  --today:#f97316;
+}
+
+*{margin:0;padding:0;box-sizing:border-box;}
+
+body{
+  font-family:Arial,sans-serif;
+  background:var(--bg);
+  color:var(--text);
+}
+
+.header{
+  position:sticky;
+  top:0;
+  z-index:100;
+  background:white;
+  border-bottom:1px solid var(--border);
+  padding:16px 24px;
+  display:flex;
+  gap:14px;
+  align-items:center;
+  justify-content:space-between;
+  flex-wrap:wrap;
+}
+
+.logo{
+  font-size:24px;
+  font-weight:800;
+}
+
+.logo span{
+  color:var(--blue);
+}
+
+.filters{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+}
+
+select{
+  padding:10px 14px;
+  border-radius:10px;
+  border:1px solid var(--border);
+  background:white;
+}
+
+.stats{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+  gap:16px;
+  padding:20px;
+}
+
+.card{
+  background:white;
+  border:1px solid var(--border);
+  border-radius:18px;
+  padding:20px;
+}
+
+.card-title{
+  font-size:13px;
+  color:var(--muted);
+}
+
+.card-value{
+  margin-top:8px;
+  font-size:34px;
+  font-weight:800;
+}
+
+.wrapper{
+  margin:0 20px 20px;
+  overflow:auto;
+  border-radius:18px;
+  background:white;
+  border:1px solid var(--border);
+}
+
+.timeline-header{
+  display:grid;
+  grid-template-columns:620px 1fr;
+  position:sticky;
+  top:34px;
+  z-index:50;
+}
+
+
+.timeline-right-header{
+  position:relative;
+  height:54px;
+  background:#f8fafc;
+  min-width:2400px;
+  border-bottom:1px solid var(--border);
+}
+
+.task-row{
+  display:grid;
+  grid-template-columns:620px 1fr;
+}
+
+.task-info{
+  background:white;
+  border-right:2px solid var(--border);
+  border-bottom:1px solid #edf2f7;
+  padding:14px 16px;
+  display:flex;
+  gap:12px;
+  align-items:flex-start;
+}
+
+.task-timeline{
+  position:relative;
+    overflow:visible;
+  border-bottom:1px solid #edf2f7;
+  min-width:2400px;
+}
+
+.grid-line{
+  position:absolute;
+  top:0;
+  bottom:0;
+  width:1px;
+  background:#edf2f7;
+}
+
+.day-label{
+  position:absolute;
+  bottom:4px;
+  font-size:10px;
+  color:var(--muted);
+}
+
+.month-label{
+  position:absolute;
+  top:4px;
+  font-size:11px;
+  font-weight:700;
+  color:var(--muted);
+}
+
+.today-line{
+  position:absolute;
+  top:0;
+  bottom:0;
+  width:2px;
+  background:var(--today);
+}
+
+.bar{
+  position:absolute;
+
+  top:50%;
+  transform:translateY(-50%);
+
+  min-height:38px;
+
+  border-radius:10px;
+
+  display:flex;
+  align-items:center;
+
+  color:white;
+
+  font-size:12px;
+  font-weight:700;
+
+  padding:10px 14px;
+
+  line-height:1.4;
+
+  white-space:normal;
+
+  overflow:visible;
+
+  word-break:break-word;
+
+  box-shadow:0 4px 12px rgba(0,0,0,.08);
+}
+
+.plan{background:linear-gradient(90deg,#2563eb,#60a5fa);}
+.work{background:linear-gradient(90deg,#d97706,#fbbf24);}
+.done{background:linear-gradient(90deg,#15803d,#4ade80);}
+.overdue{background:linear-gradient(90deg,#dc2626,#f87171);}
+.approval{background:linear-gradient(90deg,#7e22ce,#c084fc);}
+
+.badge{
+  min-width:95px;
+  text-align:center;
+  padding:6px 10px;
+  border-radius:20px;
+  font-size:10px;
+  font-weight:700;
+  color:white;
+}
+
+.days{
+  margin-left:auto;
+  white-space:nowrap;
+  font-size:11px;
+  color:var(--muted);
+}
+
+.comment{
+  margin-top:8px;
+  padding:8px 10px;
+  border-radius:10px;
+  background:#f8fafc;
+  border:1px solid #e2e8f0;
+  color:var(--muted);
+  font-size:11px;
+  line-height:1.4;
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+
+  <div class="logo">
+    Служба цифровизации<span> и Data EX</span>
+  </div>
+
+  <div class="filters">
+
+    <select id="dkFilter">
+      <option value="">Все ДК</option>
+    </select>
+
+    <select id="stageFilter">
+      <option value="">Все этапы</option>
+    </select>
+
+    <select id="statusFilter">
+      <option value="">Все статусы</option>
+      <option value="работ">В работе</option>
+      <option value="вып">Выполнено</option>
+      <option value="план">План</option>
+    </select>
+
+  </div>
+
+  <div id="todayText"></div>
+
+</div>
+
+<div class="stats">
+
+  <div class="card">
+    <div class="card-title">Всего задач</div>
+    <div class="card-value" id="totalTasks">0</div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">В работе</div>
+    <div class="card-value" id="workTasks">0</div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Выполнено</div>
+    <div class="card-value" id="doneTasks">0</div>
+  </div>
+
+</div>
+
+<div class="wrapper" id="wrapper"></div>
+
+<script>
+
+const SHEET_URL =
+'https://docs.google.com/spreadsheets/d/1fqgdfF8_w1XeSsYYmLAgYJ5MczJrqFlAY1MpEqnKIr0/export?format=csv&gid=0';
+
+const DAY = 44;
+
+let allData = [];
+let currentDay = new Date();
+
+function parseCSV(text){
+
+  const rows = [];
+  const lines = text.split('\n');
+
+  const headers = splitCSV(lines[0]);
+
+  for(let i=1;i<lines.length;i++){
+
+    if(!lines[i].trim()) continue;
+
+    const cols = splitCSV(lines[i]);
+
+    const obj = {};
+
+    headers.forEach((h,index)=>{
+      obj[h] = cols[index] || '';
+    });
+
+    rows.push(obj);
+
+  }
+
+  return rows;
+
+}
+
+function splitCSV(line){
+
+  const result = [];
+  let current = '';
+  let inQuotes = false;
+
+  for(let i=0;i<line.length;i++){
+
+    const char = line[i];
+
+    if(char === '"'){
+      inQuotes = !inQuotes;
+      continue;
+    }
+
+    if(char === ',' && !inQuotes){
+      result.push(current.trim());
+      current = '';
+      continue;
+    }
+
+    current += char;
+
+  }
+
+  result.push(current.trim());
+
+  return result;
+
+}
+
+function parseDate(str){
+
+  if(!str) return new Date();
+
+  const p = str.split('.');
+
+  if(p.length===3){
+    return new Date(p[2], p[1]-1, p[0]);
+  }
+
+  return new Date(str);
+
+}
+
+function getClass(r){
+
+  if(r.task.toLowerCase().includes('утверж')){
+    return 'approval';
+  }
+
+  if(r.status.includes('вып')){
+    return 'done';
+  }
+
+  if(r.status.includes('работ')){
+    return 'work';
+  }
+
+  if(r.end < currentDay){
+    return 'overdue';
+  }
+
+  return 'plan';
+
+}
+
+function fillFilters(){
+
+  const dkSel = document.getElementById('dkFilter');
+
+  const dks = [...new Set(allData.map(x=>x.dk).filter(Boolean))];
+
+  dkSel.innerHTML =
+    '<option value="">Все ДК</option>';
+
+  dks.forEach(d=>{
+
+    dkSel.innerHTML +=
+      `<option value="${d}">${d}</option>`;
+
+  });
+
+  updateStages();
+
+  dkSel.onchange = ()=>{
+    updateStages();
+    render();
+  };
+
+  document.getElementById('stageFilter').onchange = render;
+  document.getElementById('statusFilter').onchange = render;
+
+}
+
+function updateStages(){
+
+  const dk =
+    document.getElementById('dkFilter').value;
+
+  const stageSel =
+    document.getElementById('stageFilter');
+
+  stageSel.innerHTML =
+    '<option value="">Все этапы</option>';
+
+  let rows = allData;
+
+  if(dk){
+    rows = rows.filter(x=>x.dk===dk);
+  }
+
+  const stages =
+    [...new Set(rows.map(x=>x.stage).filter(Boolean))];
+
+  stages.forEach(s=>{
+    stageSel.innerHTML +=
+      `<option value="${s}">${s}</option>`;
+  });
+
+}
+
+function render(){
+
+  const wrapper =
+    document.getElementById('wrapper');
+
+  wrapper.innerHTML = '';
+
+  const dk =
+    document.getElementById('dkFilter').value;
+
+  const stage =
+    document.getElementById('stageFilter').value;
+
+  const status =
+    document.getElementById('statusFilter').value;
+
+  const data =
+    allData.filter(r=>{
+
+      if(dk && r.dk !== dk) return false;
+
+      if(stage && r.stage !== stage) return false;
+
+      if(status && !r.status.includes(status)) return false;
+
+      return true;
+
+    });
+
+  document.getElementById('totalTasks').innerText =
+    data.length;
+
+  document.getElementById('workTasks').innerText =
+    data.filter(x=>x.status.includes('работ')).length;
+
+  document.getElementById('doneTasks').innerText =
+    data.filter(x=>x.status.includes('вып')).length;
+
+
+  if(!data.length) return;
+
+  const min =
+    new Date(Math.min(...data.map(x=>x.start)));
+
+  const max =
+    new Date(Math.max(...data.map(x=>x.end)));
+
+  min.setDate(min.getDate()-5);
+  max.setDate(max.getDate()+10);
+
+  const totalDays =
+    Math.ceil((max-min)/86400000);
+
+  const header =
+    document.createElement('div');
+
+  header.className = 'timeline-header';
+
+  header.innerHTML = `
+    <div class="timeline-left-header">
+    </div>
+    <div class="timeline-right-header" id="timelineHeader"></div>
+  `;
+
+  wrapper.appendChild(header);
+
+  const timelineHeader =
+    document.getElementById('timelineHeader');
+
+  for(let i=0;i<totalDays;i++){
+
+    const d =
+      new Date(min.getTime()+i*86400000);
+
+    const line =
+      document.createElement('div');
+
+    line.className = 'grid-line';
+
+    line.style.left =
+      (i*DAY)+'px';
+
+    timelineHeader.appendChild(line);
+
+    if(i%7===0){
+
+      const day =
+        document.createElement('div');
+
+      day.className = 'day-label';
+
+      day.style.left =
+        (i*DAY+2)+'px';
+
+      day.innerText = d.getDate();
+
+      timelineHeader.appendChild(day);
+
+    }
+
+    if(d.getDate()===1){
+
+      const month =
+        document.createElement('div');
+
+      month.className = 'month-label';
+
+      month.style.left =
+        (i*DAY+4)+'px';
+
+      month.innerText =
+        d.toLocaleDateString('ru-RU',{
+          month:'short'
+        });
+
+      timelineHeader.appendChild(month);
+
+    }
+
+  }
+
+  data.forEach(r=>{
+
+    const row =
+      document.createElement('div');
+
+    row.className = 'task-row';
+
+    const info =
+      document.createElement('div');
+
+    info.className = 'task-info';
+
+    const cls = getClass(r);
+
+    const daysLeft =
+      Math.ceil(
+        (r.end-currentDay)/(1000*60*60*24)
+      );
+
+    const comment =
+      r.comment
+      ? `<div class="comment">💬 ${r.comment}</div>`
+      : '';
+
+    info.innerHTML = `
+      <div style="width:100%;">
+
+        <div style="font-weight:700;">
+          ${r.dk}
+        </div>
+
+        <div style="
+          margin-top:4px;
+          font-size:12px;
+          color:#7c3aed;
+          font-weight:700;
+        ">
+          ${r.stage}
+        </div>
+
+        <div style="
+          margin-top:8px;
+          font-size:13px;
+          line-height:1.4;
+        ">
+          ${r.task}
+        </div>
+
+        ${comment}
+
+      </div>
+
+      <div class="badge ${cls}">
+        ${r.status || 'план'}
+      </div>
+
+      <div class="days"
+        style="color:${daysLeft<0 ? '#ef4444' : '#64748b'};">
+        ${daysLeft<0 ? 'Просрочено' : daysLeft + ' дн.'}
+      </div>
+    `;
+
+    const timeline =
+      document.createElement('div');
+
+    timeline.className = 'task-timeline';
+
+    const rowHeight =
+      Math.max(info.scrollHeight + 28, 130);
+
+    timeline.style.height =
+      rowHeight + 'px';
+
+    info.style.height =
+      rowHeight + 'px';
+
+    for(let i=0;i<totalDays;i++){
+
+      const line =
+        document.createElement('div');
+
+      line.className = 'grid-line';
+
+      line.style.left =
+        (i*DAY)+'px';
+
+      timeline.appendChild(line);
+
+    }
+
+    const todayOffset =
+      Math.floor((currentDay-min)/86400000);
+
+    const todayLine =
+      document.createElement('div');
+
+    todayLine.className = 'today-line';
+
+    todayLine.style.left =
+      (todayOffset*DAY)+'px';
+
+    timeline.appendChild(todayLine);
+
+    const start =
+      Math.floor((r.start-min)/86400000);
+
+    const duration =
+      Math.max(
+        1,
+        Math.floor((r.end-r.start)/86400000)+1
+      );
+
+    const bar =
+      document.createElement('div');
+
+    bar.className = 'bar ' + cls;
+
+    bar.style.left =
+      (start*DAY+2)+'px';
+
+    bar.style.width =
+      Math.max(duration*DAY-8,180)+'px';
+
+    bar.innerHTML = `
+
+  <div style="
+    display:flex;
+    flex-direction:column;
+    gap:4px;
+    padding:8px 0;
+  ">
+
+    <div>
+      ${r.task}
+    </div>
+
+    ${
+      r.comment
+      ? `
+        <div style="
+          font-size:10px;
+          font-weight:500;
+          opacity:.95;
+          line-height:1.35;
+          white-space:normal;
+        ">
+          💬 ${r.comment}
+        </div>
+      `
+      : ''
+    }
+
+  </div>
+
+`;
+
+    timeline.appendChild(bar);
+
+    row.appendChild(info);
+    row.appendChild(timeline);
+
+    wrapper.appendChild(row);
+
+  });
+
+}
+
+async function load(){
+
+  try{
+
+    const res = await fetch(SHEET_URL);
+
+    const text = await res.text();
+
+    const rows = parseCSV(text);
+
+    allData = rows.map(r=>({
+
+      dk:r['Наименование ДК'] || '',
+      stage:r['Наименование Этапа'] || '',
+      task:r['Наименование задачи'] || '',
+      start:parseDate(r['Срок начала']),
+      end:parseDate(r['Срок Окончания']),
+      status:(r['Статус'] || '').toLowerCase(),
+      comment:r['Комментарий'] || '',
+      today:parseDate(r['Текущий день'])
+
+    })).filter(x=>x.task);
+
+    currentDay =
+      allData.find(x=>x.today)?.today
+      || new Date();
+
+    document.getElementById('todayText').innerHTML =
+      '<b>Текущий день:</b> ' +
+      currentDay.toLocaleDateString('ru-RU');
+
+    fillFilters();
+
+    render();
+
+  }catch(err){
+
+    console.error(err);
+
+    alert(
+      'Google Sheets не загрузился. Откройте таблицу: "Все у кого есть ссылка → Читатель"'
+    );
+
+  }
+
+}
+
+load();
+
+</script>
+
+</body>
+</html>
