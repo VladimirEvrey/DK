@@ -261,7 +261,10 @@ select:hover,select:focus{border-color:var(--accent);}
       <option value="выполнено">Выполнено</option>
       <option value="в работе">В работе</option>
       <option value="план">План</option>
+      <option value="исполнено">Исполнено в срок</option>
+      <option value="просрочено_исп">Исполнено с просрочкой</option>
     </select>
+    <select id="assigneeFilter"><option value="">Все ответственные</option></select>
   </div>
   <div class="today-badge" id="todayBadge">Текущий день: <b>—</b></div>
 </div>
@@ -437,6 +440,20 @@ function fmtDate(d) {
   if (!d) return '—';
   return d.toLocaleDateString('ru-RU',{day:'2-digit',month:'2-digit',year:'numeric'});
 }
+function computeStatus(task) {
+  // Если есть дата исполнения — статус определяется по ней
+  if (task.completedDate) {
+    // Сравниваем дату исполнения с датой окончания задачи
+    if (task.end) {
+      const cd = new Date(task.completedDate); cd.setHours(0,0,0,0);
+      const ed = new Date(task.end);           ed.setHours(0,0,0,0);
+      return cd <= ed ? 'исполнено' : 'просрочено_исп';
+    }
+    return 'исполнено';
+  }
+  return task.statusRaw; // иначе берём из колонки Статус
+}
+
 function normalizeStatus(s) {
   if (!s) return 'план';
   const v = s.toLowerCase().trim();
@@ -464,21 +481,29 @@ function parseData(rows) {
   const cStatus  = col('Статус','status');
   const cResult  = col('Требуемый результат','результат');
   const cToday   = col('Текущий день','текущий');
-  const cComment = col('Комментарий','comment','коммент');
+  const cComment   = col('Комментарий','comment','коммент');
+  const cAssignee  = col('Ответственный','ответств','assignee','исполнитель');
+  const cCompleted = col('Дата исполнения','исполнения','дата испол','completed');
 
   if (!cTask) { alert('Не найдена колонка «Наименование задачи»'); return; }
 
   allData = rows.map(r => ({
-    dk:      (r[cDK]     ||'').toString().trim(),
-    stage:   (r[cStage]  ||'').toString().trim(),
-    name:    (r[cTask]   ||'').toString().trim(),
-    start:   parseDate(r[cStart]),
-    end:     parseDate(r[cEnd]),
-    status:  normalizeStatus(r[cStatus]),
-    result:  (r[cResult]  ||'').toString().trim(),
-    comment: cComment ? (r[cComment]||'').toString().trim() : '',
-    todayRaw:parseDate(r[cToday])
-  })).filter(r => r.name);
+    dk:            (r[cDK]       ||'').toString().trim(),
+    stage:         (r[cStage]    ||'').toString().trim(),
+    name:          (r[cTask]     ||'').toString().trim(),
+    start:         parseDate(r[cStart]),
+    end:           parseDate(r[cEnd]),
+    statusRaw:     normalizeStatus(r[cStatus]),
+    result:        (r[cResult]   ||'').toString().trim(),
+    comment:       cComment   ? (r[cComment]  ||'').toString().trim() : '',
+    assignee:      cAssignee  ? (r[cAssignee] ||'').toString().trim() : '',
+    completedDate: cCompleted ? parseDate(r[cCompleted]) : null,
+    todayRaw:      parseDate(r[cToday])
+  })).filter(r => r.name).map(r => {
+    // Вычисляем итоговый статус с учётом даты исполнения
+    r.status = computeStatus(r);
+    return r;
+  });
 
   const todayFromData = allData.find(r => r.todayRaw)?.todayRaw;
   today = todayFromData || new Date();
@@ -503,6 +528,12 @@ function populateFilters() {
   dkSel.onchange = () => { updateStageFilter(); renderGantt(); };
   document.getElementById('stageFilter').onchange = renderGantt;
   document.getElementById('statusFilter').onchange = renderGantt;
+  // Ответственные
+  const assignees = [...new Set(allData.map(r=>r.assignee).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'ru'));
+  const aSel = document.getElementById('assigneeFilter');
+  aSel.innerHTML = '<option value="">Все ответственные</option>';
+  assignees.forEach(a => aSel.innerHTML += `<option value="${a}">${a}</option>`);
+  aSel.onchange = renderGantt;
   updateStageFilter(); // вызываем после dkSel.value
 }
 function updateStageFilter() {
@@ -516,13 +547,15 @@ function updateStageFilter() {
   if (stages.includes(prev)) sel.value = prev;
 }
 function getFiltered() {
-  const dk     = document.getElementById('dkFilter').value;
-  const stage  = document.getElementById('stageFilter').value;
-  const status = document.getElementById('statusFilter').value;
+  const dk       = document.getElementById('dkFilter').value;
+  const stage    = document.getElementById('stageFilter').value;
+  const status   = document.getElementById('statusFilter').value;
+  const assignee = document.getElementById('assigneeFilter').value;
   return allData.filter(r => {
-    if (dk     && r.dk     !== dk)     return false;
-    if (stage  && r.stage  !== stage)  return false;
-    if (status && r.status !== status) return false;
+    if (dk       && r.dk       !== dk)       return false;
+    if (stage    && r.stage    !== stage)    return false;
+    if (status   && r.status   !== status)   return false;
+    if (assignee && r.assignee !== assignee) return false;
     return true;
   });
 }
@@ -533,8 +566,11 @@ function getFiltered() {
 function updateStats(data) {
   document.getElementById('statTotal').textContent   = data.length;
   document.getElementById('statWip').textContent     = data.filter(r=>r.status==='в работе').length;
-  document.getElementById('statDone').textContent    = data.filter(r=>r.status==='выполнено').length;
-  const overdue = data.filter(r=>r.end && r.end<today && r.status!=='выполнено').length;
+  document.getElementById('statDone').textContent    = data.filter(r=>r.status==='выполнено'||r.status==='исполнено').length;
+  const overdue = data.filter(r=>
+    r.status==='просрочено_исп' ||
+    (r.end && r.end<today && r.status!=='выполнено' && r.status!=='исполнено')
+  ).length;
   document.getElementById('statOverdue').textContent = overdue;
 }
 
@@ -655,12 +691,14 @@ function renderGantt() {
       const norm = node.status||'';
       const app  = isApproval(node);
 
-      if      (level===0)              bar.classList.add('bar-dk');
-      else if (level===1)              bar.classList.add('bar-stage');
-      else if (app)                    bar.classList.add('bar-approval');
-      else if (norm==='выполнено')     bar.classList.add('bar-done');
-      else if (norm==='в работе')      bar.classList.add(node.end<today ? 'bar-overdue':'bar-wip');
-      else                             bar.classList.add(node.end&&node.end<today ? 'bar-overdue':'bar-plan');
+      if      (level===0)                   bar.classList.add('bar-dk');
+      else if (level===1)                   bar.classList.add('bar-stage');
+      else if (app)                         bar.classList.add('bar-approval');
+      else if (norm==='выполнено')          bar.classList.add('bar-done');
+      else if (norm==='исполнено')          bar.classList.add('bar-done');
+      else if (norm==='просрочено_исп')     bar.classList.add('bar-overdue');
+      else if (norm==='в работе')           bar.classList.add(node.end<today ? 'bar-overdue':'bar-wip');
+      else                                  bar.classList.add(node.end&&node.end<today ? 'bar-overdue':'bar-plan');
 
       bar.style.left=bLeft+'px'; bar.style.width=bWidth+'px';
 
@@ -729,24 +767,42 @@ function renderGantt() {
       const norm = node.status||'';
       const app  = isApproval(node);
       const pill = document.createElement('div'); pill.className='status-pill';
-      if      (app)                       { pill.classList.add('s-approval'); pill.textContent='УТВЕРЖД.'; }
-      else if (norm==='выполнено')        { pill.classList.add('s-done');     pill.textContent='ГОТОВО'; }
-      else if (norm==='в работе')         {
-        if (node.end&&node.end<today)     { pill.classList.add('s-overdue');  pill.textContent='ПРОСРОЧ.'; }
-        else                              { pill.classList.add('s-wip');      pill.textContent='В РАБОТЕ'; }
+      if      (app)                            { pill.classList.add('s-approval'); pill.textContent='УТВЕРЖД.'; }
+      else if (norm==='выполнено')             { pill.classList.add('s-done');     pill.textContent='ГОТОВО'; }
+      else if (norm==='исполнено')             { pill.classList.add('s-done');     pill.textContent='ИСПОЛНЕНО ✓'; }
+      else if (norm==='просрочено_исп')        { pill.classList.add('s-overdue');  pill.textContent='ПРОСРОЧ.ИСП'; }
+      else if (norm==='в работе')              {
+        if (node.end&&node.end<today)          { pill.classList.add('s-overdue');  pill.textContent='ПРОСРОЧ.'; }
+        else                                   { pill.classList.add('s-wip');      pill.textContent='В РАБОТЕ'; }
       } else {
-        if (node.end&&node.end<today)     { pill.classList.add('s-overdue');  pill.textContent='ПРОСРОЧ.'; }
-        else                              { pill.classList.add('s-plan');     pill.textContent='ПЛАН'; }
+        if (node.end&&node.end<today)          { pill.classList.add('s-overdue');  pill.textContent='ПРОСРОЧ.'; }
+        else                                   { pill.classList.add('s-plan');     pill.textContent='ПЛАН'; }
       }
       lRow.appendChild(pill);
 
       if (node.end) {
         const dL = Math.ceil((node.end-today)/86400000);
         const dl = document.createElement('div'); dl.className='days-left';
-        if      (norm==='выполнено') { dl.textContent='✓';                       dl.classList.add('ok'); }
-        else if (dL<0)               { dl.textContent=`+${Math.abs(dL)}д`;       dl.classList.add('urgent'); }
-        else                         { dl.textContent=`${dL}д`;                  dL<=3?dl.classList.add('urgent'):dl.classList.add('ok'); }
+        if      (norm==='выполнено'||norm==='исполнено') {
+          dl.textContent='✓'; dl.classList.add('ok');
+        } else if (norm==='просрочено_исп') {
+          // показываем дату исполнения
+          dl.textContent = node.completedDate ? fmtDate(node.completedDate) : '!';
+          dl.classList.add('urgent'); dl.style.fontSize='9px';
+        } else if (dL<0) {
+          dl.textContent=`+${Math.abs(dL)}д`; dl.classList.add('urgent');
+        } else {
+          dl.textContent=`${dL}д`; dL<=3?dl.classList.add('urgent'):dl.classList.add('ok');
+        }
         lRow.appendChild(dl);
+      }
+      // Ответственный под названием задачи
+      if (node.assignee) {
+        const as = document.createElement('div');
+        as.style.cssText='font-size:9px;color:var(--text3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:120px;';
+        as.textContent='👤 '+node.assignee;
+        as.title=node.assignee;
+        lRow.appendChild(as);
       }
     }
 
@@ -816,6 +872,8 @@ function showTooltip(e, node) {
     <div class="tooltip-row"><span class="tooltip-key">Начало</span><span class="tooltip-val">${fmtDate(node.start)}</span></div>
     <div class="tooltip-row"><span class="tooltip-key">Окончание</span><span class="tooltip-val">${fmtDate(node.end)}</span></div>
     ${dL!==null?`<div class="tooltip-row"><span class="tooltip-key">Срок</span><span class="tooltip-val">${dHtml}</span></div>`:''}
+    ${node.assignee?`<div class="tooltip-row"><span class="tooltip-key">Ответственный</span><span class="tooltip-val">👤 ${node.assignee}</span></div>`:''}
+    ${node.completedDate?`<div class="tooltip-row"><span class="tooltip-key">Дата исполнения</span><span class="tooltip-val" style="color:${node.status==='исполнено'?'var(--done)':'var(--overdue)'};">${fmtDate(node.completedDate)}</span></div>`:''}
     ${node.result?`<div class="tooltip-block result">📄 <span><b>Закрывающий документ:</b><br>${node.result}</span></div>`:''}
     ${node.comment?`<div class="tooltip-block comment">💬 <span><b>Комментарий:</b><br>${node.comment}</span></div>`:''}
   `;
