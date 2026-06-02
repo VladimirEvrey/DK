@@ -29,101 +29,80 @@ body{font-family:'Geologica',sans-serif;background:var(--bg);color:var(--text);m
 .header{
   position:sticky;top:0;z-index:100;
   background:var(--surface);border-bottom:1px solid var(--border);
-  padding:12px 24px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;
+  padding:10px 20px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;
   box-shadow:var(--shadow);
 }
-.logo{font-size:17px;font-weight:700;white-space:nowrap;letter-spacing:-.3px;}
+.logo{font-size:16px;font-weight:700;white-space:nowrap;letter-spacing:-.3px;margin-right:4px;}
 .logo span{color:var(--accent);}
-.header-controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap;flex:1;}
-select{
+.header-controls{display:flex;gap:7px;align-items:center;flex-wrap:wrap;flex:1;}
+select,input[type="text"]{
   background:var(--surface2);border:1.5px solid var(--border2);color:var(--text);
-  font-family:'Geologica',sans-serif;font-size:13px;padding:7px 12px;
+  font-family:'Geologica',sans-serif;font-size:12.5px;padding:6px 10px;
   border-radius:8px;cursor:pointer;outline:none;box-shadow:var(--shadow);
   transition:border-color .2s;
 }
-select:hover,select:focus{border-color:var(--accent);}
-.upload-btn{
-  background:var(--accent);color:#fff;border:none;font-family:'Geologica',sans-serif;
-  font-size:13px;font-weight:600;padding:8px 13px;border-radius:8px;cursor:pointer;
-  display:flex;align-items:center;gap:5px;white-space:nowrap;
-  box-shadow:0 2px 8px rgba(45,106,79,.25);transition:opacity .2s;
-}
-.upload-btn:hover{opacity:.86;}
-#fileInput{display:none;}
-.gs-wrap{
-  display:flex;align-items:center;border:1.5px solid var(--border2);border-radius:8px;
-  overflow:hidden;background:#fff;box-shadow:var(--shadow);flex:1;min-width:260px;max-width:460px;
-  transition:border-color .2s;
-}
-.gs-wrap:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px rgba(45,106,79,.1);}
-#gsUrl{
-  flex:1;border:none;outline:none;background:transparent;
-  font-family:'Geologica',sans-serif;font-size:12.5px;color:var(--text);padding:7px 10px;
-}
-#gsUrl::placeholder{color:var(--text3);}
-.gs-btn{
-  background:var(--accent);color:#fff;border:none;font-family:'Geologica',sans-serif;
-  font-size:12px;font-weight:700;padding:8px 13px;cursor:pointer;white-space:nowrap;
-  transition:opacity .2s;
-}
-.gs-btn:hover{opacity:.85;}
+select:hover,select:focus,input[type="text"]:hover,input[type="text"]:focus{border-color:var(--accent);}
+input[type="text"]::placeholder{color:var(--text3);}
+.search-wrap{position:relative;display:flex;align-items:center;}
+.search-wrap i{position:absolute;left:9px;font-size:14px;color:var(--text3);pointer-events:none;}
+.search-wrap input{padding-left:28px;min-width:180px;}
 .today-badge{
   font-size:12px;color:var(--text2);font-family:'JetBrains Mono',monospace;
   background:var(--surface2);border:1.5px solid var(--border2);
   padding:5px 11px;border-radius:8px;white-space:nowrap;box-shadow:var(--shadow);
 }
 .today-badge b{color:var(--today-line);}
+.goto-today-btn{
+  background:var(--accent);color:#fff;border:none;font-family:'Geologica',sans-serif;
+  font-size:12px;font-weight:600;padding:7px 12px;border-radius:8px;cursor:pointer;
+  white-space:nowrap;box-shadow:0 2px 8px rgba(45,106,79,.25);transition:opacity .2s;
+}
+.goto-today-btn:hover{opacity:.86;}
 
 /* ── STATS ── */
 .stats{
-  display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
-  gap:14px;padding:16px 24px 4px;
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
+  gap:12px;padding:14px 20px 4px;
 }
 .stat-card{
   background:var(--surface);border:1px solid var(--border);border-radius:14px;
-  padding:16px 20px;box-shadow:var(--shadow);
+  padding:14px 18px;box-shadow:var(--shadow);
 }
-.stat-title{font-size:12px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.5px;}
-.stat-value{font-size:32px;font-weight:800;margin-top:6px;color:var(--text);}
+.stat-title{font-size:11px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.5px;}
+.stat-value{font-size:28px;font-weight:800;margin-top:4px;color:var(--text);}
 .stat-value.green{color:var(--done);}
 .stat-value.amber{color:var(--wip);}
 .stat-value.red{color:var(--overdue);}
 
 /* ── LEGEND ── */
 .legend{
-  display:flex;gap:14px;padding:8px 24px;background:var(--surface);
+  display:flex;gap:14px;padding:7px 20px;background:var(--surface);
   border-bottom:1px solid var(--border);flex-wrap:wrap;align-items:center;
 }
 .legend-lbl{font-size:11px;color:var(--text3);font-weight:700;letter-spacing:.5px;margin-right:4px;}
-.legend-item{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--text2);}
-.legend-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
-.legend-swatch{display:inline-block;width:26px;height:13px;border-radius:4px;flex-shrink:0;}
-.legend-line-swatch{width:16px;height:2.5px;border-radius:2px;background:var(--today-line);flex-shrink:0;}
+.legend-item{display:flex;align-items:center;gap:5px;font-size:11.5px;color:var(--text2);}
+.legend-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
+.legend-swatch{display:inline-block;width:22px;height:12px;border-radius:3px;flex-shrink:0;}
+.legend-line-swatch{width:14px;height:2.5px;border-radius:2px;background:var(--today-line);flex-shrink:0;}
 
-/* ── UPLOAD ZONE ── */
-.upload-zone{
-  margin:50px auto;max-width:500px;border:2px dashed var(--border2);border-radius:18px;
-  padding:56px 40px;text-align:center;cursor:pointer;transition:border-color .3s,background .3s;
-  background:var(--surface);box-shadow:var(--shadow2);
-}
-.upload-zone:hover,.upload-zone.drag{border-color:var(--accent);background:rgba(45,106,79,.03);}
-.upload-zone .icon{font-size:50px;margin-bottom:16px;}
-.upload-zone h2{font-size:20px;font-weight:600;margin-bottom:10px;}
-.upload-zone p{color:var(--text2);font-size:13px;line-height:1.8;}
-.upload-zone code{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--accent);}
+/* ── LOADING ── */
+.loading-state{text-align:center;padding:60px 40px;color:var(--text3);}
+.loading-state .spin{width:32px;height:32px;border:3px solid var(--border2);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 16px;}
 
-/* ── EMPTY / ERROR ── */
+/* ── EMPTY ── */
 .empty-state{text-align:center;padding:70px 40px;color:var(--text3);display:none;}
 .empty-state .icon{font-size:38px;margin-bottom:12px;}
 
 /* ── GANTT WRAP ── */
-#ganttContainer{display:none;overflow-x:auto;}
-.gantt-wrap{min-width:100%;display:grid;grid-template-columns:400px 1fr;}
+#ganttContainer{display:none;}
+.gantt-scroll-outer{overflow-x:auto;position:relative;}
+.gantt-wrap{display:flex;width:max-content;}
 
 /* ── LEFT PANEL ── */
 .gantt-left{
+  width:400px;min-width:400px;flex-shrink:0;
   border-right:2px solid var(--border2);background:var(--surface);
-  position:sticky;left:0;z-index:20;box-shadow:2px 0 8px rgba(20,40,25,.05);
+  position:sticky;left:0;z-index:20;box-shadow:2px 0 8px rgba(20,40,25,.07);
 }
 .gantt-header-cell{
   height:54px;display:flex;align-items:center;padding:0 16px;
@@ -159,7 +138,7 @@ select:hover,select:focus{border-color:var(--accent);}
 .days-left.ok{color:var(--done);}
 
 /* ── RIGHT / CHART ── */
-.gantt-right{position:relative;overflow:hidden;background:var(--surface);}
+.gantt-right{position:relative;background:var(--surface);}
 .gantt-timeline-header{height:54px;border-bottom:2px solid var(--border2);position:relative;background:var(--surface2);z-index:10;}
 .month-label{position:absolute;top:5px;font-size:10px;font-weight:700;color:var(--text3);letter-spacing:.6px;text-transform:uppercase;user-select:none;}
 .day-label{position:absolute;bottom:5px;font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--text3);user-select:none;}
@@ -182,7 +161,6 @@ select:hover,select:focus{border-color:var(--accent);}
 .bar:hover{filter:brightness(.92);z-index:5;}
 .bar-label{font-size:10px;color:rgba(255,255,255,.95);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:600;max-width:100%;}
 
-/* Bar colour classes */
 .bar-dk       {background:linear-gradient(90deg,#2d6a4f,#52b788);}
 .bar-stage    {background:linear-gradient(90deg,#40916c,#74c69d);}
 .bar-approval {background:linear-gradient(90deg,#4a7c6f,#7aab9e);}
@@ -191,7 +169,6 @@ select:hover,select:focus{border-color:var(--accent);}
 .bar-plan     {background:linear-gradient(90deg,#52796f,#84a98c);}
 .bar-overdue  {background:linear-gradient(90deg,#7a5c5c,#b08888);}
 
-/* Inline comment label */
 .bar-comment{
   position:absolute;top:9px;height:26px;display:flex;align-items:center;
   padding:0 9px;background:#fff;border:1.5px solid var(--border2);border-radius:6px;
@@ -199,7 +176,6 @@ select:hover,select:focus{border-color:var(--accent);}
   max-width:240px;overflow:hidden;text-overflow:ellipsis;
   box-shadow:var(--shadow);pointer-events:none;z-index:6;gap:5px;
 }
-/* Closing doc label */
 .bar-closing-doc{
   position:absolute;top:9px;height:26px;display:flex;align-items:center;
   gap:5px;padding:0 9px;background:var(--approval-bg);
@@ -208,7 +184,6 @@ select:hover,select:focus{border-color:var(--accent);}
   max-width:220px;overflow:hidden;text-overflow:ellipsis;
   box-shadow:var(--shadow);pointer-events:none;z-index:6;
 }
-/* Approval circle */
 .approval-marker{
   position:absolute;top:11px;width:22px;height:22px;background:var(--approval);
   border-radius:50%;display:flex;align-items:center;justify-content:center;
@@ -230,7 +205,6 @@ select:hover,select:focus{border-color:var(--accent);}
 .tooltip-block.result{background:var(--approval-bg);border:1.5px solid rgba(61,107,94,.2);color:var(--approval);}
 .tooltip-block.comment{background:var(--surface2);border:1.5px solid var(--border2);color:var(--text2);}
 
-/* ── SCROLLBAR ── */
 ::-webkit-scrollbar{width:7px;height:7px;}
 ::-webkit-scrollbar-track{background:var(--surface2);}
 ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px;}
@@ -244,27 +218,25 @@ select:hover,select:focus{border-color:var(--accent);}
 
 <!-- HEADER -->
 <div class="header">
-  <div class="logo">Служба цифровизации<span> и Data EX</span></div>
+  <div class="logo">Консолидированный календарь <span> Дорожных карт</span></div>
   <div class="header-controls">
-    <label class="upload-btn" for="fileInput">📂 Excel</label>
-    <input type="file" id="fileInput" accept=".xlsx,.xls">
-
-    <div class="gs-wrap">
-      <input type="text" id="gsUrl" value="https://docs.google.com/spreadsheets/d/1fqgdfF8_w1XeSsYYmLAgYJ5MczJrqFlAY1MpEqnKIr0/edit?gid=0#gid=0" autocomplete="off" spellcheck="false">
-      <button class="gs-btn" id="gsLoadBtn">↗ Загрузить</button>
+    <div class="search-wrap">
+      <span style="position:absolute;left:9px;font-size:14px;color:var(--text3);">🔍</span>
+      <input type="text" id="searchInput" placeholder="Поиск по задачам..." style="padding-left:30px;min-width:200px;" oninput="renderGantt()">
     </div>
-
+    <select id="subdivFilter"><option value="">— Подразделение —</option></select>
     <select id="dkFilter"><option value="">— Наименование ДК —</option></select>
     <select id="stageFilter"><option value="">Все этапы</option></select>
     <select id="statusFilter">
       <option value="">Все статусы</option>
-      <option value="выполнено">Выполнено</option>
-      <option value="в работе">В работе</option>
-      <option value="план">План</option>
-      <option value="исполнено">Исполнено в срок</option>
-      <option value="просрочено_исп">Исполнено с просрочкой</option>
+      <option value="выполнено">✅ Выполнено</option>
+      <option value="в работе">🔄 В работе</option>
+      <option value="план">📋 План</option>
+      <option value="просрочено_исп">⚠️ Выполнено с просрочкой</option>
+      <option value="__overdue__">🔴 Просрочено (не завершены)</option>
     </select>
     <select id="assigneeFilter"><option value="">Все ответственные</option></select>
+    <button class="goto-today-btn" onclick="scrollToToday()">📍 Сегодня</button>
   </div>
   <div class="today-badge" id="todayBadge">Текущий день: <b>—</b></div>
 </div>
@@ -290,17 +262,10 @@ select:hover,select:focus{border-color:var(--accent);}
   <div class="legend-item"><div class="legend-line-swatch"></div>Сегодня</div>
 </div>
 
-<!-- UPLOAD ZONE -->
-<div id="uploadZone" class="upload-zone">
-  <div class="icon">📊</div>
-  <h2>Загрузите данные</h2>
-  <p>
-    <b>Вариант 1:</b> Перетащите .xlsx файл или нажмите «Excel»<br>
-    <b>Вариант 2:</b> Вставьте ссылку на Google Таблицу и нажмите «↗ Загрузить»<br><br>
-    Нужные колонки:<br>
-    <code>Наименование ДК · Наименование Этапа · Наименование задачи<br>
-    Срок начала · Срок Окончания · Статус · Требуемый результат · Текущий день · Комментарий</code>
-  </p>
+<!-- LOADING -->
+<div id="loadingState" class="loading-state">
+  <div class="spin"></div>
+  <p>Загрузка данных…</p>
 </div>
 
 <div class="empty-state" id="emptyState">
@@ -309,94 +274,66 @@ select:hover,select:focus{border-color:var(--accent);}
 </div>
 
 <div id="ganttContainer">
-  <div class="gantt-wrap" id="ganttWrap"></div>
+  <div class="gantt-scroll-outer" id="ganttScrollOuter">
+    <div class="gantt-wrap" id="ganttWrap"></div>
+  </div>
 </div>
 
 <div class="tooltip" id="tooltip"></div>
 
 <script>
-// ─────────────────────────────────────────────
-//  STATE
-// ─────────────────────────────────────────────
 let allData = [];
 let today   = null;
 const DAY_W = 24;
+let gMinDate = null;
 
-// ─────────────────────────────────────────────
-//  EXCEL UPLOAD
-// ─────────────────────────────────────────────
-document.getElementById('fileInput').addEventListener('change', e => {
-  const f = e.target.files[0]; if (f) readExcel(f);
-});
-const uploadZone = document.getElementById('uploadZone');
-uploadZone.addEventListener('click', () => document.getElementById('fileInput').click());
-uploadZone.addEventListener('dragover',  e => { e.preventDefault(); uploadZone.classList.add('drag'); });
-uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('drag'));
-uploadZone.addEventListener('drop', e => {
-  e.preventDefault(); uploadZone.classList.remove('drag');
-  const f = e.dataTransfer.files[0]; if (f) readExcel(f);
-});
-
-function readExcel(file) {
-  const r = new FileReader();
-  r.onload = e => {
-    try {
-      const wb = XLSX.read(e.target.result, { type:'binary', cellDates:true });
-      const ws = wb.Sheets[wb.SheetNames[0]];
-      const rows = XLSX.utils.sheet_to_json(ws, { defval:'' });
-      parseData(rows);
-    } catch(err) { alert('Ошибка чтения файла: ' + err.message); }
-  };
-  r.readAsBinaryString(file);
+// ─── DATE HELPERS ───────────────────────────────────────────────
+function parseDate(v) {
+  if (!v) return null;
+  if (v instanceof Date) return v;
+  if (typeof v === 'number') return new Date(Math.round((v-25569)*86400*1000));
+  const dot = (v+'').split('.');
+  if (dot.length===3) return new Date(+dot[2], +dot[1]-1, +dot[0]);
+  const d = new Date(v);
+  return isNaN(d) ? null : d;
 }
-
-// ─────────────────────────────────────────────
-//  GOOGLE SHEETS LOADER
-// ─────────────────────────────────────────────
-function gsIdFromUrl(url) {
-  const m = url.match(/\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/);
-  return m ? m[1] : null;
+function fmtDate(d) {
+  if (!d) return '—';
+  return d.toLocaleDateString('ru-RU',{day:'2-digit',month:'2-digit',year:'numeric'});
 }
-function gsGidFromUrl(url) {
-  const m = url.match(/[#&?]gid=([0-9]+)/);
-  return m ? m[1] : '0';
-}
+function daysBetween(a,b) { return Math.floor((b-a)/86400000); }
 
-async function loadFromGS() {
-  const url = document.getElementById('gsUrl').value.trim();
-  if (!url) { alert('Вставьте ссылку на Google Таблицу'); return; }
-  const sheetId = gsIdFromUrl(url);
-  if (!sheetId) { alert('Не удалось найти ID таблицы.\nПример: https://docs.google.com/spreadsheets/d/XXXXX/edit'); return; }
-  const gid    = gsGidFromUrl(url);
-  const csvUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/export?format=csv&gid=${gid}`;
-
-  const btn = document.getElementById('gsLoadBtn');
-  btn.innerHTML = '<span class="spin"></span>';
-  btn.disabled  = true;
-
-  try {
-    const resp = await fetch(csvUrl);
-    if (!resp.ok) throw new Error(`HTTP ${resp.status} — таблица не открыта для просмотра`);
-    const text = await resp.text();
-    const rows = csvToRows(text);
-    if (!rows.length) throw new Error('Таблица пустая или неверный формат');
-    uploadZone.style.display = 'none';
-    parseData(rows);
-  } catch(err) {
-    alert('Ошибка загрузки:\n' + err.message +
-      '\n\nПроверьте:\n1. Файл → Настройки доступа → «Все у кого есть ссылка» → Читатель\n2. Ссылка скопирована из адресной строки браузера');
-  } finally {
-    btn.innerHTML = '↗ Загрузить';
-    btn.disabled  = false;
+// ─── STATUS ─────────────────────────────────────────────────────
+function computeStatus(task) {
+  if (task.completedDate) {
+    if (task.end) {
+      const cd = new Date(task.completedDate); cd.setHours(0,0,0,0);
+      const ed = new Date(task.end);           ed.setHours(0,0,0,0);
+      return cd <= ed ? 'исполнено' : 'просрочено_исп';
+    }
+    return 'исполнено';
   }
+  return task.statusRaw;
+}
+function normalizeStatus(s) {
+  if (!s) return 'план';
+  const v = s.toLowerCase().trim();
+  if (v.includes('выполн')) return 'выполнено';
+  if (v.includes('работ'))  return 'в работе';
+  return 'план';
+}
+function isApproval(task) {
+  const kw = ['утвержд','согласован','форма','приказ','распоряжен'];
+  const n = (task.name||'').toLowerCase();
+  const r = (task.result||'').toLowerCase();
+  return kw.some(k => n.includes(k)||r.includes(k));
+}
+function isActiveOverdue(task) {
+  return task.end && task.end < today &&
+    task.status !== 'выполнено' && task.status !== 'исполнено' && task.status !== 'просрочено_исп';
 }
 
-document.getElementById('gsLoadBtn').addEventListener('click', loadFromGS);
-document.getElementById('gsUrl').addEventListener('keydown', e => { if (e.key==='Enter') loadFromGS(); });
-
-// ─────────────────────────────────────────────
-//  CSV PARSER
-// ─────────────────────────────────────────────
+// ─── CSV PARSER ──────────────────────────────────────────────────
 function csvToRows(csv) {
   const lines = csv.split(/\r?\n/);
   if (lines.length < 2) return [];
@@ -423,72 +360,30 @@ function parseCsvLine(line) {
   return res;
 }
 
-// ─────────────────────────────────────────────
-//  DATA PARSING
-// ─────────────────────────────────────────────
-function parseDate(v) {
-  if (!v) return null;
-  if (v instanceof Date) return v;
-  if (typeof v === 'number') return new Date(Math.round((v-25569)*86400*1000));
-  // dd.mm.yyyy
-  const dot = (v+'').split('.');
-  if (dot.length===3) return new Date(+dot[2], +dot[1]-1, +dot[0]);
-  const d = new Date(v);
-  return isNaN(d) ? null : d;
-}
-function fmtDate(d) {
-  if (!d) return '—';
-  return d.toLocaleDateString('ru-RU',{day:'2-digit',month:'2-digit',year:'numeric'});
-}
-function computeStatus(task) {
-  // Если есть дата исполнения — статус определяется по ней
-  if (task.completedDate) {
-    // Сравниваем дату исполнения с датой окончания задачи
-    if (task.end) {
-      const cd = new Date(task.completedDate); cd.setHours(0,0,0,0);
-      const ed = new Date(task.end);           ed.setHours(0,0,0,0);
-      return cd <= ed ? 'исполнено' : 'просрочено_исп';
-    }
-    return 'исполнено';
-  }
-  return task.statusRaw; // иначе берём из колонки Статус
-}
-
-function normalizeStatus(s) {
-  if (!s) return 'план';
-  const v = s.toLowerCase().trim();
-  if (v.includes('выполн')) return 'выполнено';
-  if (v.includes('работ'))  return 'в работе';
-  return 'план';
-}
-function isApproval(task) {
-  const kw = ['утвержд','согласован','форма','приказ','распоряжен'];
-  const n = (task.name||'').toLowerCase();
-  const r = (task.result||'').toLowerCase();
-  return kw.some(k => n.includes(k)||r.includes(k));
-}
-
+// ─── PARSE DATA ──────────────────────────────────────────────────
 function parseData(rows) {
   if (!rows.length) { alert('Файл пуст или неверный формат'); return; }
   const keys = Object.keys(rows[0]);
   const col = (...v) => keys.find(k => v.some(x => k.toLowerCase().includes(x.toLowerCase())));
 
-  const cDK      = col('Наименование ДК','дк');
-  const cStage   = col('Наименование Этапа','этап');
-  const cTask    = col('Наименование задачи','задач');
-  const cStart   = col('Срок начала','начала','начало');
-  const cEnd     = col('Срок Окончания','окончани','конец');
-  const cStatus  = col('Статус','status');
-  const cResult  = col('Требуемый результат','результат');
-  const cToday   = col('Текущий день','текущий');
-  const cComment   = col('Комментарий','comment','коммент');
-  const cAssignee  = col('Ответственный','ответств','assignee','исполнитель');
-  const cCompleted = col('Дата исполнения','исполнения','дата испол','completed');
+  const cDK       = col('Наименование ДК','дк');
+  const cSubdiv   = col('Подразделение','subdivision','подразд');
+  const cStage    = col('Наименование Этапа','этап');
+  const cTask     = col('Наименование задачи','задач');
+  const cStart    = col('Срок начала','начала','начало');
+  const cEnd      = col('Срок Окончания','окончани','конец');
+  const cStatus   = col('Статус','status');
+  const cResult   = col('Требуемый результат','результат');
+  const cToday    = col('Текущий день','текущий');
+  const cComment  = col('Комментарий','comment','коммент');
+  const cAssignee = col('Ответственный','ответств','assignee','исполнитель');
+  const cCompleted= col('Дата исполнения','исполнения','дата испол','completed');
 
   if (!cTask) { alert('Не найдена колонка «Наименование задачи»'); return; }
 
   allData = rows.map(r => ({
     dk:            (r[cDK]       ||'').toString().trim(),
+    subdiv:        cSubdiv ? (r[cSubdiv]||'').toString().trim() : '',
     stage:         (r[cStage]    ||'').toString().trim(),
     name:          (r[cTask]     ||'').toString().trim(),
     start:         parseDate(r[cStart]),
@@ -496,11 +391,12 @@ function parseData(rows) {
     statusRaw:     normalizeStatus(r[cStatus]),
     result:        (r[cResult]   ||'').toString().trim(),
     comment:       cComment   ? (r[cComment]  ||'').toString().trim() : '',
-    assignee:      cAssignee  ? (r[cAssignee] ||'').toString().trim() : '',
+    assigneeRaw:   cAssignee  ? (r[cAssignee] ||'').toString().trim() : '',
+    assignees:     cAssignee  ? (r[cAssignee] ||'').toString().trim().split(',').map(a=>a.trim()).filter(Boolean) : [],
+    assignee:      cAssignee  ? (r[cAssignee] ||'').toString().trim().split(',').map(a=>a.trim()).filter(Boolean)[0]||'' : '',
     completedDate: cCompleted ? parseDate(r[cCompleted]) : null,
     todayRaw:      parseDate(r[cToday])
   })).filter(r => r.name).map(r => {
-    // Вычисляем итоговый статус с учётом даты исполнения
     r.status = computeStatus(r);
     return r;
   });
@@ -510,35 +406,62 @@ function parseData(rows) {
   today.setHours(0,0,0,0);
 
   document.getElementById('todayBadge').innerHTML = `Текущий день: <b>${fmtDate(today)}</b>`;
-  uploadZone.style.display = 'none';
+  document.getElementById('loadingState').style.display = 'none';
   populateFilters();
   renderGantt();
+  // Auto-scroll to today after first render
+  setTimeout(scrollToToday, 150);
 }
 
-// ─────────────────────────────────────────────
-//  FILTERS
-// ─────────────────────────────────────────────
+// ─── FILTERS ─────────────────────────────────────────────────────
 function populateFilters() {
+  // Подразделения
+  const subdivs = [...new Set(allData.map(r=>r.subdiv).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'ru'));
+  const subSel = document.getElementById('subdivFilter');
+  subSel.innerHTML = '<option value="">— Подразделение —</option>';
+  subdivs.forEach(s => subSel.innerHTML += `<option value="${s}">${s}</option>`);
+  subSel.onchange = () => { updateDKFilter(); updateStageFilter(); renderGantt(); };
+
+  // ДК
   const dks = [...new Set(allData.map(r=>r.dk).filter(Boolean))];
   const dkSel = document.getElementById('dkFilter');
   dkSel.innerHTML = '<option value="">— Наименование ДК —</option>';
   dks.forEach(d => dkSel.innerHTML += `<option value="${d}">${d}</option>`);
-  // Сначала ставим значение, ПОТОМ updateStageFilter
   if (dks.length===1) dkSel.value = dks[0];
   dkSel.onchange = () => { updateStageFilter(); renderGantt(); };
+
   document.getElementById('stageFilter').onchange = renderGantt;
   document.getElementById('statusFilter').onchange = renderGantt;
-  // Ответственные
-  const assignees = [...new Set(allData.map(r=>r.assignee).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'ru'));
+
+  // Ответственные — разбиваем по каждому имени
+  const assigneeSet = new Set();
+  allData.forEach(r => (r.assignees||[]).forEach(a => { if(a) assigneeSet.add(a); }));
+  const assignees = [...assigneeSet].sort((a,b)=>a.localeCompare(b,'ru'));
   const aSel = document.getElementById('assigneeFilter');
   aSel.innerHTML = '<option value="">Все ответственные</option>';
   assignees.forEach(a => aSel.innerHTML += `<option value="${a}">${a}</option>`);
   aSel.onchange = renderGantt;
-  updateStageFilter(); // вызываем после dkSel.value
+
+  updateStageFilter();
 }
+
+function updateDKFilter() {
+  const subdiv = document.getElementById('subdivFilter').value;
+  const filtered = subdiv ? allData.filter(r => r.subdiv === subdiv) : allData;
+  const dks = [...new Set(filtered.map(r=>r.dk).filter(Boolean))];
+  const dkSel = document.getElementById('dkFilter');
+  const prev = dkSel.value;
+  dkSel.innerHTML = '<option value="">— Наименование ДК —</option>';
+  dks.forEach(d => dkSel.innerHTML += `<option value="${d}">${d}</option>`);
+  if (dks.includes(prev)) dkSel.value = prev;
+}
+
 function updateStageFilter() {
   const dk = document.getElementById('dkFilter').value;
-  const filtered = dk ? allData.filter(r => r.dk === dk) : allData;
+  const subdiv = document.getElementById('subdivFilter').value;
+  let filtered = allData;
+  if (subdiv) filtered = filtered.filter(r => r.subdiv === subdiv);
+  if (dk)     filtered = filtered.filter(r => r.dk === dk);
   const stages = [...new Set(filtered.map(r=>r.stage).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'ru'));
   const sel = document.getElementById('stageFilter');
   const prev = sel.value;
@@ -546,42 +469,48 @@ function updateStageFilter() {
   stages.forEach(s => sel.innerHTML += `<option value="${s}">${s}</option>`);
   if (stages.includes(prev)) sel.value = prev;
 }
+
 function getFiltered() {
+  const subdiv   = document.getElementById('subdivFilter').value;
   const dk       = document.getElementById('dkFilter').value;
   const stage    = document.getElementById('stageFilter').value;
   const status   = document.getElementById('statusFilter').value;
   const assignee = document.getElementById('assigneeFilter').value;
+  const search   = document.getElementById('searchInput').value.trim().toLowerCase();
+
   return allData.filter(r => {
+    if (subdiv   && r.subdiv   !== subdiv)   return false;
     if (dk       && r.dk       !== dk)       return false;
     if (stage    && r.stage    !== stage)    return false;
-    if (status   && r.status   !== status)   return false;
-    if (assignee && r.assignee !== assignee) return false;
+    if (assignee && !(r.assignees||[]).includes(assignee)) return false;
+    if (status === '__overdue__') {
+      if (!isActiveOverdue(r)) return false;
+    } else if (status === 'выполнено') {
+      if (r.status !== 'выполнено' && r.status !== 'исполнено') return false;
+    } else if (status && r.status !== status) return false;
+    if (search) {
+      const haystack = [r.name, r.dk, r.stage, r.assignee, r.subdiv, r.comment, r.result].join(' ').toLowerCase();
+      if (!haystack.includes(search)) return false;
+    }
     return true;
   });
 }
 
-// ─────────────────────────────────────────────
-//  STATS UPDATE
-// ─────────────────────────────────────────────
+// ─── STATS ───────────────────────────────────────────────────────
 function updateStats(data) {
   document.getElementById('statTotal').textContent   = data.length;
   document.getElementById('statWip').textContent     = data.filter(r=>r.status==='в работе').length;
   document.getElementById('statDone').textContent    = data.filter(r=>r.status==='выполнено'||r.status==='исполнено').length;
-  const overdue = data.filter(r=>
-    r.status==='просрочено_исп' ||
-    (r.end && r.end<today && r.status!=='выполнено' && r.status!=='исполнено')
-  ).length;
+  const overdue = data.filter(r => r.status==='просрочено_исп' || isActiveOverdue(r)).length;
   document.getElementById('statOverdue').textContent = overdue;
 }
 
-// ─────────────────────────────────────────────
-//  HIERARCHY
-// ─────────────────────────────────────────────
+// ─── HIERARCHY ───────────────────────────────────────────────────
 function buildHierarchy(data) {
   const dkMap = {};
   data.forEach(task => {
     const dk = task.dk||'(без ДК)';
-    if (!dkMap[dk]) dkMap[dk] = {name:dk,start:null,end:null,status:'',result:'',comment:'',children:{}};
+    if (!dkMap[dk]) dkMap[dk] = {name:dk,subdiv:task.subdiv,start:null,end:null,status:'',result:'',comment:'',children:{}};
     const dkN = dkMap[dk];
     if (task.start) dkN.start = dkN.start ? new Date(Math.min(dkN.start,task.start)) : task.start;
     if (task.end)   dkN.end   = dkN.end   ? new Date(Math.max(dkN.end,  task.end))   : task.end;
@@ -595,9 +524,19 @@ function buildHierarchy(data) {
   return Object.values(dkMap).map(dk => ({...dk, children:Object.values(dk.children)}));
 }
 
-// ─────────────────────────────────────────────
-//  RENDER
-// ─────────────────────────────────────────────
+// ─── SCROLL TO TODAY ─────────────────────────────────────────────
+function scrollToToday() {
+  if (!gMinDate || !today) return;
+  const outer = document.getElementById('ganttScrollOuter');
+  if (!outer) return;
+  const leftPanelWidth = 400;
+  const todayOff = daysBetween(gMinDate, today);
+  const px = todayOff * DAY_W + DAY_W / 2;
+  const viewWidth = outer.clientWidth - leftPanelWidth;
+  outer.scrollLeft = Math.max(0, px - viewWidth / 2);
+}
+
+// ─── RENDER ──────────────────────────────────────────────────────
 function renderGantt() {
   const data = getFiltered();
   const container   = document.getElementById('ganttContainer');
@@ -617,6 +556,7 @@ function renderGantt() {
   minDate.setDate(minDate.getDate()-3);
   maxDate.setDate(maxDate.getDate()+35);
   minDate.setHours(0,0,0,0); maxDate.setHours(0,0,0,0);
+  gMinDate = minDate;
 
   const totalDays  = Math.ceil((maxDate-minDate)/86400000);
   const chartWidth = totalDays*DAY_W;
@@ -644,7 +584,7 @@ function renderGantt() {
     rH.appendChild(tl);
   }
 
-  // Flatten hierarchy
+  // Flatten
   const flat = [];
   (function flatten(nodes, lvl) {
     nodes.forEach(n => { flat.push({node:n,level:lvl}); if(n.children) flatten(n.children,lvl+1); });
@@ -660,7 +600,6 @@ function renderGantt() {
   });
 
   meta.forEach(({lRow,rRow,node,level},i) => {
-
     // Grid lines
     for (let d=0; d<totalDays; d++) {
       const date = new Date(minDate.getTime()+d*86400000);
@@ -690,15 +629,15 @@ function renderGantt() {
       const bar = document.createElement('div'); bar.className='bar';
       const norm = node.status||'';
       const app  = isApproval(node);
+      const overdueActive = isActiveOverdue(node);
 
-      if      (level===0)                   bar.classList.add('bar-dk');
-      else if (level===1)                   bar.classList.add('bar-stage');
-      else if (app)                         bar.classList.add('bar-approval');
-      else if (norm==='выполнено')          bar.classList.add('bar-done');
-      else if (norm==='исполнено')          bar.classList.add('bar-done');
-      else if (norm==='просрочено_исп')     bar.classList.add('bar-overdue');
-      else if (norm==='в работе')           bar.classList.add(node.end<today ? 'bar-overdue':'bar-wip');
-      else                                  bar.classList.add(node.end&&node.end<today ? 'bar-overdue':'bar-plan');
+      if      (level===0)               bar.classList.add('bar-dk');
+      else if (level===1)               bar.classList.add('bar-stage');
+      else if (app)                     bar.classList.add('bar-approval');
+      else if (norm==='выполнено'||norm==='исполнено') bar.classList.add('bar-done');
+      else if (norm==='просрочено_исп') bar.classList.add('bar-overdue');
+      else if (norm==='в работе')       bar.classList.add(overdueActive?'bar-overdue':'bar-wip');
+      else                              bar.classList.add(overdueActive?'bar-overdue':'bar-plan');
 
       bar.style.left=bLeft+'px'; bar.style.width=bWidth+'px';
 
@@ -711,7 +650,6 @@ function renderGantt() {
       bar.addEventListener('mouseleave', hideTooltip);
       rRow.appendChild(bar);
 
-      // Inline comment
       let afterX = bLeft+bWidth+8;
       if (node.comment && level>=1) {
         const cb = document.createElement('div'); cb.className='bar-comment';
@@ -721,8 +659,6 @@ function renderGantt() {
         rRow.appendChild(cb);
         afterX += Math.min(node.comment.length*7+38, 248)+8;
       }
-
-      // Closing document
       if (node.result && level===2) {
         const db = document.createElement('div'); db.className='bar-closing-doc';
         db.style.left=afterX+'px';
@@ -730,8 +666,6 @@ function renderGantt() {
         db.title='Закрывающий документ: '+node.result;
         rRow.appendChild(db);
       }
-
-      // Approval marker
       if (app && level===2) {
         const mk = document.createElement('div'); mk.className='approval-marker'; mk.textContent='✓';
         const mOff = Math.min(endOff+1,totalDays-1);
@@ -743,7 +677,7 @@ function renderGantt() {
       }
     }
 
-    // LEFT ROW
+    // Left row
     const hasKids = node.children && node.children.length>0;
     if (hasKids) {
       const ic = document.createElement('span'); ic.className='collapse-icon'; ic.textContent='▼';
@@ -763,30 +697,37 @@ function renderGantt() {
     const lb = document.createElement('div'); lb.className='row-label'; lb.textContent=node.name; lb.title=node.name;
     lRow.appendChild(lb);
 
+    // Subdiv badge for DK rows
+    if (level===0 && node.subdiv) {
+      const sb = document.createElement('div');
+      sb.style.cssText='font-size:9px;padding:2px 6px;border-radius:10px;background:var(--plan-bg);color:var(--plan);font-weight:700;flex-shrink:0;white-space:nowrap;max-width:100px;overflow:hidden;text-overflow:ellipsis;';
+      sb.textContent=node.subdiv; sb.title=node.subdiv;
+      lRow.appendChild(sb);
+    }
+
     if (level===2) {
       const norm = node.status||'';
       const app  = isApproval(node);
+      const overdueActive = isActiveOverdue(node);
       const pill = document.createElement('div'); pill.className='status-pill';
-      if      (app)                            { pill.classList.add('s-approval'); pill.textContent='УТВЕРЖД.'; }
-      else if (norm==='выполнено')             { pill.classList.add('s-done');     pill.textContent='ГОТОВО'; }
-      else if (norm==='исполнено')             { pill.classList.add('s-done');     pill.textContent='ИСПОЛНЕНО ✓'; }
-      else if (norm==='просрочено_исп')        { pill.classList.add('s-overdue');  pill.textContent='ПРОСРОЧ.ИСП'; }
-      else if (norm==='в работе')              {
-        if (node.end&&node.end<today)          { pill.classList.add('s-overdue');  pill.textContent='ПРОСРОЧ.'; }
-        else                                   { pill.classList.add('s-wip');      pill.textContent='В РАБОТЕ'; }
+      if      (app)                       { pill.classList.add('s-approval'); pill.textContent='УТВЕРЖД.'; }
+      else if (norm==='выполнено')        { pill.classList.add('s-done');     pill.textContent='ГОТОВО'; }
+      else if (norm==='исполнено')        { pill.classList.add('s-done');     pill.textContent='ИСПОЛ.✓'; }
+      else if (norm==='просрочено_исп')   { pill.classList.add('s-overdue');  pill.textContent='ПР.ИСП.'; }
+      else if (norm==='в работе')         {
+        if (overdueActive)                { pill.classList.add('s-overdue');  pill.textContent='ПРОСРОЧ.'; }
+        else                              { pill.classList.add('s-wip');      pill.textContent='В РАБОТЕ'; }
       } else {
-        if (node.end&&node.end<today)          { pill.classList.add('s-overdue');  pill.textContent='ПРОСРОЧ.'; }
-        else                                   { pill.classList.add('s-plan');     pill.textContent='ПЛАН'; }
+        if (overdueActive)                { pill.classList.add('s-overdue');  pill.textContent='ПРОСРОЧ.'; }
+        else                              { pill.classList.add('s-plan');     pill.textContent='ПЛАН'; }
       }
       lRow.appendChild(pill);
 
       if (node.end) {
         const dL = Math.ceil((node.end-today)/86400000);
         const dl = document.createElement('div'); dl.className='days-left';
-        if      (norm==='выполнено'||norm==='исполнено') {
-          dl.textContent='✓'; dl.classList.add('ok');
-        } else if (norm==='просрочено_исп') {
-          // показываем дату исполнения
+        if      (norm==='выполнено'||norm==='исполнено') { dl.textContent='✓'; dl.classList.add('ok'); }
+        else if (norm==='просрочено_исп') {
           dl.textContent = node.completedDate ? fmtDate(node.completedDate) : '!';
           dl.classList.add('urgent'); dl.style.fontSize='9px';
         } else if (dL<0) {
@@ -796,12 +737,11 @@ function renderGantt() {
         }
         lRow.appendChild(dl);
       }
-      // Ответственный под названием задачи
-      if (node.assignee) {
+      if (node.assignees && node.assignees.length) {
         const as = document.createElement('div');
         as.style.cssText='font-size:9px;color:var(--text3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:120px;';
-        as.textContent='👤 '+node.assignee;
-        as.title=node.assignee;
+        as.textContent='👤 '+node.assignees.join(', ');
+        as.title=node.assignees.join(', ');
         lRow.appendChild(as);
       }
     }
@@ -814,9 +754,7 @@ function renderGantt() {
   wrap.appendChild(rightPanel);
 }
 
-// ─────────────────────────────────────────────
-//  TIMELINE HEADER
-// ─────────────────────────────────────────────
+// ─── TIMELINE HEADER ─────────────────────────────────────────────
 function buildTimelineHeader(container, minDate, totalDays) {
   let curMonth=null, mStart=0;
   for (let d=0; d<totalDays; d++) {
@@ -843,11 +781,7 @@ function buildTimelineHeader(container, minDate, totalDays) {
   }
 }
 
-function daysBetween(a,b) { return Math.floor((b-a)/86400000); }
-
-// ─────────────────────────────────────────────
-//  TOOLTIP
-// ─────────────────────────────────────────────
+// ─── TOOLTIP ─────────────────────────────────────────────────────
 const tooltip = document.getElementById('tooltip');
 
 function showTooltip(e, node) {
@@ -855,24 +789,27 @@ function showTooltip(e, node) {
   const dL   = node.end ? Math.ceil((node.end-today)/86400000) : null;
   let stHtml='';
   if      (norm==='выполнено') stHtml=`<span style="color:var(--done)">● Выполнено</span>`;
+  else if (norm==='исполнено') stHtml=`<span style="color:var(--done)">● Исполнено в срок</span>`;
   else if (norm==='в работе')  stHtml=`<span style="color:var(--wip)">● В работе</span>`;
+  else if (norm==='просрочено_исп') stHtml=`<span style="color:var(--overdue)">● Исполнено с просрочкой</span>`;
   else                         stHtml=`<span style="color:var(--plan)">● План</span>`;
-  if (node.end&&node.end<today&&norm!=='выполнено') stHtml=`<span style="color:var(--overdue)">● Просрочено</span>`;
+  if (isActiveOverdue(node)) stHtml=`<span style="color:var(--overdue)">● Просрочено</span>`;
 
   let dHtml='';
   if (dL!==null) {
-    if      (norm==='выполнено') dHtml=`<span style="color:var(--done)">Завершено ✓</span>`;
-    else if (dL<0)               dHtml=`<span style="color:var(--overdue)">Просрочено на ${Math.abs(dL)} дн.</span>`;
-    else                         dHtml=`<span style="color:var(--done)">Осталось ${dL} дн.</span>`;
+    if (norm==='выполнено'||norm==='исполнено') dHtml=`<span style="color:var(--done)">Завершено ✓</span>`;
+    else if (dL<0) dHtml=`<span style="color:var(--overdue)">Просрочено на ${Math.abs(dL)} дн.</span>`;
+    else           dHtml=`<span style="color:var(--done)">Осталось ${dL} дн.</span>`;
   }
 
   tooltip.innerHTML = `
     <h4>${node.name}</h4>
+    ${node.subdiv?`<div class="tooltip-row"><span class="tooltip-key">Подразделение</span><span class="tooltip-val">${node.subdiv}</span></div>`:''}
     <div class="tooltip-row"><span class="tooltip-key">Статус</span><span class="tooltip-val">${stHtml}</span></div>
     <div class="tooltip-row"><span class="tooltip-key">Начало</span><span class="tooltip-val">${fmtDate(node.start)}</span></div>
     <div class="tooltip-row"><span class="tooltip-key">Окончание</span><span class="tooltip-val">${fmtDate(node.end)}</span></div>
     ${dL!==null?`<div class="tooltip-row"><span class="tooltip-key">Срок</span><span class="tooltip-val">${dHtml}</span></div>`:''}
-    ${node.assignee?`<div class="tooltip-row"><span class="tooltip-key">Ответственный</span><span class="tooltip-val">👤 ${node.assignee}</span></div>`:''}
+    ${node.assignees&&node.assignees.length?`<div class="tooltip-row"><span class="tooltip-key">Ответственный</span><span class="tooltip-val">👤 ${node.assignees.join(', ')}</span></div>`:''}
     ${node.completedDate?`<div class="tooltip-row"><span class="tooltip-key">Дата исполнения</span><span class="tooltip-val" style="color:${node.status==='исполнено'?'var(--done)':'var(--overdue)'};">${fmtDate(node.completedDate)}</span></div>`:''}
     ${node.result?`<div class="tooltip-block result">📄 <span><b>Закрывающий документ:</b><br>${node.result}</span></div>`:''}
     ${node.comment?`<div class="tooltip-block comment">💬 <span><b>Комментарий:</b><br>${node.comment}</span></div>`:''}
@@ -886,32 +823,26 @@ function moveTooltip(e) {
 }
 function hideTooltip() { tooltip.style.display='none'; }
 
-// ─── АВТОЗАГРУЗКА ─────────────────────────────────────────────
-const HARDCODED_URL = 'https://docs.google.com/spreadsheets/d/1fqgdfF8_w1XeSsYYmLAgYJ5MczJrqFlAY1MpEqnKIr0/export?format=csv&gid=0';
+// ─── AUTO LOAD ───────────────────────────────────────────────────
+const GS_URL = 'https://docs.google.com/spreadsheets/d/1fqgdfF8_w1XeSsYYmLAgYJ5MczJrqFlAY1MpEqnKIr0/export?format=csv&gid=0';
 
-async function autoLoad() {
-  const btn = document.getElementById('gsLoadBtn');
-  btn.innerHTML = '<span class="spin"></span>';
-  btn.disabled = true;
+(async function autoLoad() {
   try {
-    const resp = await fetch(HARDCODED_URL);
+    const resp = await fetch(GS_URL);
     if (!resp.ok) throw new Error('HTTP ' + resp.status);
     const text = await resp.text();
     const rows = csvToRows(text);
-    if (!rows.length) throw new Error('Таблица пустая');
-    document.getElementById('uploadZone').style.display = 'none';
+    if (!rows.length) throw new Error('Пустая таблица');
     parseData(rows);
   } catch(err) {
-    console.warn('Автозагрузка не удалась:', err.message);
-    // Не прячем upload zone — пользователь может загрузить вручную
-  } finally {
-    btn.innerHTML = '↗ Загрузить';
-    btn.disabled = false;
+    document.getElementById('loadingState').innerHTML = `
+      <div style="font-size:36px;margin-bottom:12px;">⚠️</div>
+      <p style="color:var(--overdue);font-weight:600;">Не удалось загрузить данные</p>
+      <p style="font-size:12px;margin-top:8px;color:var(--text3);">${err.message}</p>
+      <p style="font-size:12px;margin-top:4px;color:var(--text3);">Проверьте доступ к таблице: Файл → Настройки доступа → «Читатель»</p>
+    `;
   }
-}
-
-// Запускаем сразу при открытии страницы
-autoLoad();
+})();
 </script>
 </body>
 </html>
