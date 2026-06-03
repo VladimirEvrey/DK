@@ -3,11 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Диаграмма Ганта</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<title>Календарь ДК</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Geologica:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
-
 :root {
   --bg:#f0f4f1; --surface:#fff; --surface2:#f2f6f3; --surface3:#e8f0ea;
   --border:#d4dfd6; --border2:#b8ccbc;
@@ -20,32 +18,85 @@
   --approval:#3d6b5e; --approval-bg:#d4e8e3;
   --today-line:#c45c3a;
   --shadow:0 1px 4px rgba(20,40,25,.08);
-  --shadow2:0 4px 16px rgba(20,40,25,.12);
+  --shadow2:0 4px 16px rgba(20,40,25,.14);
 }
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:'Geologica',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
 
 /* ── HEADER ── */
 .header{
-  position:sticky;top:0;z-index:100;
+  position:sticky;top:0;z-index:200;
   background:var(--surface);border-bottom:1px solid var(--border);
   padding:10px 20px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;
   box-shadow:var(--shadow);
 }
-.logo{font-size:16px;font-weight:700;white-space:nowrap;letter-spacing:-.3px;margin-right:4px;}
+.logo{font-size:15px;font-weight:700;white-space:nowrap;letter-spacing:-.3px;margin-right:4px;}
 .logo span{color:var(--accent);}
 .header-controls{display:flex;gap:7px;align-items:center;flex-wrap:wrap;flex:1;}
-select,input[type="text"]{
-  background:var(--surface2);border:1.5px solid var(--border2);color:var(--text);
-  font-family:'Geologica',sans-serif;font-size:12.5px;padding:6px 10px;
-  border-radius:8px;cursor:pointer;outline:none;box-shadow:var(--shadow);
-  transition:border-color .2s;
-}
-select:hover,select:focus,input[type="text"]:hover,input[type="text"]:focus{border-color:var(--accent);}
-input[type="text"]::placeholder{color:var(--text3);}
+
+/* ── SEARCH ── */
 .search-wrap{position:relative;display:flex;align-items:center;}
-.search-wrap i{position:absolute;left:9px;font-size:14px;color:var(--text3);pointer-events:none;}
-.search-wrap input{padding-left:28px;min-width:180px;}
+.search-wrap input{
+  background:var(--surface2);border:1.5px solid var(--border2);color:var(--text);
+  font-family:'Geologica',sans-serif;font-size:12.5px;padding:6px 10px 6px 28px;
+  border-radius:8px;outline:none;box-shadow:var(--shadow);transition:border-color .2s;min-width:180px;
+}
+.search-wrap input:focus{border-color:var(--accent);}
+.search-wrap input::placeholder{color:var(--text3);}
+.search-icon{position:absolute;left:9px;font-size:13px;color:var(--text3);pointer-events:none;}
+
+/* ── MULTISELECT DROPDOWN ── */
+.ms-wrap{position:relative;user-select:none;}
+.ms-trigger{
+  display:flex;align-items:center;gap:5px;cursor:pointer;
+  background:var(--surface2);border:1.5px solid var(--border2);
+  border-radius:8px;padding:6px 10px;font-size:12.5px;color:var(--text);
+  box-shadow:var(--shadow);transition:border-color .2s;white-space:nowrap;min-width:130px;
+}
+.ms-trigger:hover,.ms-trigger.open{border-color:var(--accent);}
+.ms-trigger-label{flex:1;overflow:hidden;text-overflow:ellipsis;}
+.ms-badge{
+  background:var(--accent);color:#fff;border-radius:10px;
+  font-size:10px;font-weight:700;padding:1px 6px;flex-shrink:0;
+}
+.ms-arrow{font-size:9px;color:var(--text3);flex-shrink:0;transition:transform .2s;}
+.ms-trigger.open .ms-arrow{transform:rotate(180deg);}
+
+.ms-dropdown{
+  position:absolute;top:calc(100% + 4px);left:0;min-width:220px;max-width:320px;
+  background:var(--surface);border:1.5px solid var(--border2);border-radius:10px;
+  box-shadow:var(--shadow2);z-index:500;display:none;overflow:hidden;
+}
+.ms-dropdown.open{display:block;}
+.ms-search{
+  padding:8px 10px;border-bottom:1px solid var(--border);
+}
+.ms-search input{
+  width:100%;border:1.5px solid var(--border2);border-radius:6px;
+  padding:5px 8px;font-family:'Geologica',sans-serif;font-size:12px;
+  color:var(--text);background:var(--surface2);outline:none;
+}
+.ms-search input:focus{border-color:var(--accent);}
+.ms-actions{
+  display:flex;gap:6px;padding:5px 10px;border-bottom:1px solid var(--border);
+}
+.ms-action-btn{
+  font-size:11px;color:var(--accent);cursor:pointer;font-weight:600;
+  padding:2px 6px;border-radius:4px;transition:background .15s;
+}
+.ms-action-btn:hover{background:var(--surface3);}
+.ms-list{max-height:220px;overflow-y:auto;}
+.ms-item{
+  display:flex;align-items:center;gap:8px;padding:7px 12px;
+  cursor:pointer;transition:background .12s;font-size:12.5px;
+}
+.ms-item:hover{background:var(--surface3);}
+.ms-item input[type=checkbox]{
+  width:14px;height:14px;accent-color:var(--accent);flex-shrink:0;cursor:pointer;
+}
+.ms-empty{padding:12px;text-align:center;font-size:12px;color:var(--text3);}
+
+/* ── TODAY BADGE / BTN ── */
 .today-badge{
   font-size:12px;color:var(--text2);font-family:'JetBrains Mono',monospace;
   background:var(--surface2);border:1.5px solid var(--border2);
@@ -60,47 +111,32 @@ input[type="text"]::placeholder{color:var(--text3);}
 .goto-today-btn:hover{opacity:.86;}
 
 /* ── STATS ── */
-.stats{
-  display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
-  gap:12px;padding:14px 20px 4px;
-}
-.stat-card{
-  background:var(--surface);border:1px solid var(--border);border-radius:14px;
-  padding:14px 18px;box-shadow:var(--shadow);
-}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:12px;padding:14px 20px 4px;}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:13px 18px;box-shadow:var(--shadow);}
 .stat-title{font-size:11px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.5px;}
 .stat-value{font-size:28px;font-weight:800;margin-top:4px;color:var(--text);}
-.stat-value.green{color:var(--done);}
-.stat-value.amber{color:var(--wip);}
-.stat-value.red{color:var(--overdue);}
+.stat-value.green{color:var(--done);} .stat-value.amber{color:var(--wip);} .stat-value.red{color:var(--overdue);}
 
 /* ── LEGEND ── */
-.legend{
-  display:flex;gap:14px;padding:7px 20px;background:var(--surface);
-  border-bottom:1px solid var(--border);flex-wrap:wrap;align-items:center;
-}
+.legend{display:flex;gap:12px;padding:7px 20px;background:var(--surface);border-bottom:1px solid var(--border);flex-wrap:wrap;align-items:center;}
 .legend-lbl{font-size:11px;color:var(--text3);font-weight:700;letter-spacing:.5px;margin-right:4px;}
-.legend-item{display:flex;align-items:center;gap:5px;font-size:11.5px;color:var(--text2);}
+.legend-item{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text2);}
 .legend-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
 .legend-swatch{display:inline-block;width:22px;height:12px;border-radius:3px;flex-shrink:0;}
 .legend-line-swatch{width:14px;height:2.5px;border-radius:2px;background:var(--today-line);flex-shrink:0;}
 
-/* ── LOADING ── */
+/* ── LOADING / EMPTY ── */
 .loading-state{text-align:center;padding:60px 40px;color:var(--text3);}
-.loading-state .spin{width:32px;height:32px;border:3px solid var(--border2);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 16px;}
-
-/* ── EMPTY ── */
+.loading-state .spin-big{width:32px;height:32px;border:3px solid var(--border2);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 16px;}
 .empty-state{text-align:center;padding:70px 40px;color:var(--text3);display:none;}
-.empty-state .icon{font-size:38px;margin-bottom:12px;}
 
-/* ── GANTT WRAP ── */
+/* ── GANTT ── */
 #ganttContainer{display:none;}
 .gantt-scroll-outer{overflow-x:auto;position:relative;}
 .gantt-wrap{display:flex;width:max-content;}
 
-/* ── LEFT PANEL ── */
 .gantt-left{
-  width:400px;min-width:400px;flex-shrink:0;
+  width:560px;min-width:560px;flex-shrink:0;
   border-right:2px solid var(--border2);background:var(--surface);
   position:sticky;left:0;z-index:20;box-shadow:2px 0 8px rgba(20,40,25,.07);
 }
@@ -109,35 +145,23 @@ input[type="text"]::placeholder{color:var(--text3);}
   border-bottom:2px solid var(--border2);font-size:11px;font-weight:700;
   letter-spacing:.8px;text-transform:uppercase;color:var(--text3);background:var(--surface2);
 }
-.task-row{
-  height:44px;display:flex;align-items:center;padding:0 14px;
-  border-bottom:1px solid var(--border);gap:7px;cursor:pointer;transition:background .12s;
-}
+.task-row{height:44px;display:flex;align-items:center;padding:0 14px;border-bottom:1px solid var(--border);gap:6px;cursor:pointer;transition:background .12s;}
 .task-row:hover{background:var(--surface3);}
-.task-row.dk-row{
-  background:linear-gradient(90deg,rgba(45,106,79,.08),rgba(45,106,79,.02));
-  border-left:3px solid var(--accent);border-bottom:1px solid var(--border2);
-  font-weight:700;font-size:13px;
-}
-.task-row.stage-row{
-  padding-left:22px;
-  background:linear-gradient(90deg,rgba(82,121,111,.06),transparent);
-  border-left:3px solid var(--accent2);font-size:12px;font-weight:600;color:var(--text2);
-}
+.task-row.dk-row{background:linear-gradient(90deg,rgba(45,106,79,.08),rgba(45,106,79,.02));border-left:3px solid var(--accent);border-bottom:1px solid var(--border2);font-weight:700;font-size:13px;}
+.task-row.stage-row{padding-left:22px;background:linear-gradient(90deg,rgba(82,121,111,.06),transparent);border-left:3px solid var(--accent2);font-size:12px;font-weight:600;color:var(--text2);}
 .task-row.task-row-item{padding-left:34px;font-size:12px;}
 .row-label{flex:1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;}
 .collapse-icon{width:16px;height:16px;display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--text3);flex-shrink:0;transition:transform .2s;}
-.status-pill{font-size:10px;padding:2px 7px;border-radius:20px;font-weight:700;flex-shrink:0;letter-spacing:.3px;}
-.s-done    {background:var(--done-bg);    color:var(--done);}
-.s-wip     {background:var(--wip-bg);     color:var(--wip);}
-.s-plan    {background:var(--plan-bg);    color:var(--plan);}
-.s-overdue {background:var(--overdue-bg); color:var(--overdue);}
-.s-approval{background:var(--approval-bg);color:var(--approval);}
-.days-left{font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--text3);flex-shrink:0;min-width:42px;text-align:right;}
+.status-pill{font-size:10px;padding:2px 6px;border-radius:20px;font-weight:700;flex-shrink:0;letter-spacing:.3px;}
+.s-done{background:var(--done-bg);color:var(--done);}
+.s-wip{background:var(--wip-bg);color:var(--wip);}
+.s-plan{background:var(--plan-bg);color:var(--plan);}
+.s-overdue{background:var(--overdue-bg);color:var(--overdue);}
+.days-left{font-size:10px;font-family:'JetBrains Mono',monospace;color:var(--text3);flex-shrink:0;min-width:38px;text-align:right;}
 .days-left.urgent{color:var(--overdue);font-weight:700;}
 .days-left.ok{color:var(--done);}
+.subdiv-tag{font-size:9px;padding:2px 5px;border-radius:8px;background:var(--plan-bg);color:var(--plan);font-weight:700;flex-shrink:0;white-space:nowrap;max-width:160px;overflow:hidden;text-overflow:ellipsis;}
 
-/* ── RIGHT / CHART ── */
 .gantt-right{position:relative;background:var(--surface);}
 .gantt-timeline-header{height:54px;border-bottom:2px solid var(--border2);position:relative;background:var(--surface2);z-index:10;}
 .month-label{position:absolute;top:5px;font-size:10px;font-weight:700;color:var(--text3);letter-spacing:.6px;text-transform:uppercase;user-select:none;}
@@ -152,51 +176,20 @@ input[type="text"]::placeholder{color:var(--text3);}
 .today-line{position:absolute;top:0;bottom:0;width:2px;background:var(--today-line);z-index:15;box-shadow:0 0 6px rgba(196,92,58,.3);pointer-events:none;}
 .today-line::after{content:'СЕГОДНЯ';position:absolute;top:3px;left:4px;font-size:9px;font-weight:700;color:var(--today-line);letter-spacing:.5px;white-space:nowrap;}
 
-/* ── BARS ── */
-.bar{
-  position:absolute;top:9px;height:26px;border-radius:6px;cursor:pointer;
-  display:flex;align-items:center;padding:0 8px;overflow:visible;
-  transition:filter .15s;box-shadow:0 1px 4px rgba(0,0,0,.1);
-}
+.bar{position:absolute;top:9px;height:26px;border-radius:6px;cursor:pointer;display:flex;align-items:center;padding:0 8px;overflow:visible;transition:filter .15s;box-shadow:0 1px 4px rgba(0,0,0,.1);}
 .bar:hover{filter:brightness(.92);z-index:5;}
 .bar-label{font-size:10px;color:rgba(255,255,255,.95);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:600;max-width:100%;}
-
-.bar-dk       {background:linear-gradient(90deg,#2d6a4f,#52b788);}
-.bar-stage    {background:linear-gradient(90deg,#40916c,#74c69d);}
-.bar-approval {background:linear-gradient(90deg,#4a7c6f,#7aab9e);}
-.bar-done     {background:linear-gradient(90deg,#1b4332,#40916c);}
-.bar-wip      {background:linear-gradient(90deg,#6a7c4f,#a0b87a);}
-.bar-plan     {background:linear-gradient(90deg,#52796f,#84a98c);}
-.bar-overdue  {background:linear-gradient(90deg,#7a5c5c,#b08888);}
-
-.bar-comment{
-  position:absolute;top:9px;height:26px;display:flex;align-items:center;
-  padding:0 9px;background:#fff;border:1.5px solid var(--border2);border-radius:6px;
-  font-size:11px;font-weight:500;color:var(--text2);white-space:nowrap;
-  max-width:240px;overflow:hidden;text-overflow:ellipsis;
-  box-shadow:var(--shadow);pointer-events:none;z-index:6;gap:5px;
-}
-.bar-closing-doc{
-  position:absolute;top:9px;height:26px;display:flex;align-items:center;
-  gap:5px;padding:0 9px;background:var(--approval-bg);
-  border:1.5px solid rgba(61,107,94,.35);border-radius:6px;
-  font-size:11px;font-weight:600;color:var(--approval);white-space:nowrap;
-  max-width:220px;overflow:hidden;text-overflow:ellipsis;
-  box-shadow:var(--shadow);pointer-events:none;z-index:6;
-}
-.approval-marker{
-  position:absolute;top:11px;width:22px;height:22px;background:var(--approval);
-  border-radius:50%;display:flex;align-items:center;justify-content:center;
-  font-size:11px;color:#fff;z-index:10;
-  box-shadow:0 2px 6px rgba(61,107,94,.3);cursor:pointer;
-}
+.bar-dk{background:linear-gradient(90deg,#2d6a4f,#52b788);}
+.bar-stage{background:linear-gradient(90deg,#40916c,#74c69d);}
+.bar-done{background:linear-gradient(90deg,#1b4332,#40916c);}
+.bar-wip{background:linear-gradient(90deg,#6a7c4f,#a0b87a);}
+.bar-plan{background:linear-gradient(90deg,#52796f,#84a98c);}
+.bar-overdue{background:linear-gradient(90deg,#7a5c5c,#b08888);}
+.bar-comment{position:absolute;top:9px;height:26px;display:flex;align-items:center;padding:0 9px;background:#fff;border:1.5px solid var(--border2);border-radius:6px;font-size:11px;font-weight:500;color:var(--text2);white-space:nowrap;max-width:240px;overflow:hidden;text-overflow:ellipsis;box-shadow:var(--shadow);pointer-events:none;z-index:6;gap:5px;}
+.bar-closing-doc{position:absolute;top:9px;height:26px;display:flex;align-items:center;gap:5px;padding:0 9px;background:var(--approval-bg);border:1.5px solid rgba(61,107,94,.35);border-radius:6px;font-size:11px;font-weight:600;color:var(--approval);white-space:nowrap;max-width:220px;overflow:hidden;text-overflow:ellipsis;box-shadow:var(--shadow);pointer-events:none;z-index:6;}
 
 /* ── TOOLTIP ── */
-.tooltip{
-  position:fixed;background:#fff;border:1.5px solid var(--border2);
-  border-radius:12px;padding:14px 18px;font-size:12px;max-width:340px;
-  z-index:1000;pointer-events:none;box-shadow:0 8px 32px rgba(20,40,25,.16);display:none;
-}
+.tooltip{position:fixed;background:#fff;border:1.5px solid var(--border2);border-radius:12px;padding:14px 18px;font-size:12px;max-width:340px;z-index:1000;pointer-events:none;box-shadow:0 8px 32px rgba(20,40,25,.16);display:none;}
 .tooltip h4{font-size:13px;margin-bottom:10px;font-weight:600;line-height:1.4;}
 .tooltip-row{display:flex;gap:8px;margin-bottom:5px;align-items:flex-start;}
 .tooltip-key{color:var(--text3);min-width:100px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.3px;}
@@ -209,39 +202,29 @@ input[type="text"]::placeholder{color:var(--text3);}
 ::-webkit-scrollbar-track{background:var(--surface2);}
 ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px;}
 ::-webkit-scrollbar-thumb:hover{background:var(--text3);}
-
 @keyframes spin{to{transform:rotate(360deg);}}
-.spin{width:16px;height:16px;border:2px solid var(--border2);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;display:inline-block;}
 </style>
 </head>
 <body>
 
-<!-- HEADER -->
 <div class="header">
-  <div class="logo">Консолидированный календарь <span> Дорожных карт</span></div>
+  <div class="logo">Консолидированный календарь<span> Дорожных карт</span></div>
   <div class="header-controls">
     <div class="search-wrap">
-      <span style="position:absolute;left:9px;font-size:14px;color:var(--text3);">🔍</span>
-      <input type="text" id="searchInput" placeholder="Поиск по задачам..." style="padding-left:30px;min-width:200px;" oninput="renderGantt()">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="searchInput" placeholder="Поиск…" oninput="renderGantt()">
     </div>
-    <select id="subdivFilter"><option value="">— Подразделение —</option></select>
-    <select id="dkFilter"><option value="">— Наименование ДК —</option></select>
-    <select id="stageFilter"><option value="">Все этапы</option></select>
-    <select id="statusFilter">
-      <option value="">Все статусы</option>
-      <option value="выполнено">✅ Выполнено</option>
-      <option value="в работе">🔄 В работе</option>
-      <option value="план">📋 План</option>
-      <option value="просрочено_исп">⚠️ Выполнено с просрочкой</option>
-      <option value="__overdue__">🔴 Просрочено (не завершены)</option>
-    </select>
-    <select id="assigneeFilter"><option value="">Все ответственные</option></select>
+    <!-- multiselect dropdowns injected by JS -->
+    <div id="msSubdiv" class="ms-wrap"></div>
+    <div id="msDK"     class="ms-wrap"></div>
+    <div id="msStage"  class="ms-wrap"></div>
+    <div id="msStatus" class="ms-wrap"></div>
+    <div id="msAssign" class="ms-wrap"></div>
     <button class="goto-today-btn" onclick="scrollToToday()">📍 Сегодня</button>
   </div>
   <div class="today-badge" id="todayBadge">Текущий день: <b>—</b></div>
 </div>
 
-<!-- STATS -->
 <div class="stats">
   <div class="stat-card"><div class="stat-title">Всего задач</div><div class="stat-value" id="statTotal">—</div></div>
   <div class="stat-card"><div class="stat-title">В работе</div><div class="stat-value amber" id="statWip">—</div></div>
@@ -249,61 +232,149 @@ input[type="text"]::placeholder{color:var(--text3);}
   <div class="stat-card"><div class="stat-title">Просрочено</div><div class="stat-value red" id="statOverdue">—</div></div>
 </div>
 
-<!-- LEGEND -->
 <div class="legend">
   <span class="legend-lbl">ЛЕГЕНДА:</span>
   <div class="legend-item"><div class="legend-dot" style="background:var(--done)"></div>Выполнено</div>
   <div class="legend-item"><div class="legend-dot" style="background:var(--wip)"></div>В работе</div>
   <div class="legend-item"><div class="legend-dot" style="background:var(--plan)"></div>План</div>
   <div class="legend-item"><div class="legend-dot" style="background:var(--overdue)"></div>Просрочено</div>
-  <div class="legend-item"><div class="legend-dot" style="background:var(--approval)"></div>Утверждение</div>
   <div class="legend-item"><span class="legend-swatch" style="background:#fff;border:1.5px solid var(--border2);"></span>Комментарий</div>
   <div class="legend-item"><span class="legend-swatch" style="background:var(--approval-bg);border:1.5px solid rgba(61,107,94,.35);"></span>Закрывающий документ</div>
   <div class="legend-item"><div class="legend-line-swatch"></div>Сегодня</div>
 </div>
 
-<!-- LOADING -->
-<div id="loadingState" class="loading-state">
-  <div class="spin"></div>
-  <p>Загрузка данных…</p>
-</div>
-
-<div class="empty-state" id="emptyState">
-  <div class="icon">🔍</div>
-  <p>Нет задач по выбранным фильтрам</p>
-</div>
-
+<div id="loadingState" class="loading-state"><div class="spin-big"></div><p>Загрузка данных…</p></div>
+<div class="empty-state" id="emptyState"><div style="font-size:36px;margin-bottom:10px">🔍</div><p>Нет задач по выбранным фильтрам</p></div>
 <div id="ganttContainer">
   <div class="gantt-scroll-outer" id="ganttScrollOuter">
     <div class="gantt-wrap" id="ganttWrap"></div>
   </div>
 </div>
-
 <div class="tooltip" id="tooltip"></div>
 
 <script>
-let allData = [];
-let today   = null;
-const DAY_W = 24;
-let gMinDate = null;
+// ═══════════════════════════════════════════════════
+//  MULTISELECT WIDGET
+// ═══════════════════════════════════════════════════
+class MultiSelect {
+  constructor(containerId, placeholder, onChange) {
+    this.placeholder = placeholder;
+    this.onChange = onChange;
+    this.selected = new Set();
+    this.allItems = [];
+    this.container = document.getElementById(containerId);
+    this._build();
+  }
+  _build() {
+    this.trigger = document.createElement('div');
+    this.trigger.className = 'ms-trigger';
+    this.trigger.innerHTML = `<span class="ms-trigger-label">${this.placeholder}</span><span class="ms-arrow">▼</span>`;
+    this.dropdown = document.createElement('div');
+    this.dropdown.className = 'ms-dropdown';
+    this.dropdown.innerHTML = `
+      <div class="ms-search"><input type="text" placeholder="Поиск…"></div>
+      <div class="ms-actions">
+        <span class="ms-action-btn" data-action="all">Все</span>
+        <span class="ms-action-btn" data-action="none">Сбросить</span>
+      </div>
+      <div class="ms-list"></div>`;
+    this.container.appendChild(this.trigger);
+    this.container.appendChild(this.dropdown);
+    this._listEl = this.dropdown.querySelector('.ms-list');
+    this._searchEl = this.dropdown.querySelector('input');
+    this.trigger.addEventListener('click', e => { e.stopPropagation(); this._toggle(); });
+    this._searchEl.addEventListener('input', () => this._renderList(this._searchEl.value.toLowerCase()));
+    this.dropdown.querySelectorAll('.ms-action-btn').forEach(btn => {
+      btn.addEventListener('click', e => {
+        e.stopPropagation();
+        if (btn.dataset.action === 'all') { this.allItems.forEach(v => this.selected.add(v)); }
+        else { this.selected.clear(); }
+        this._renderList(this._searchEl.value.toLowerCase());
+        this._updateTrigger();
+        this.onChange();
+      });
+    });
+    document.addEventListener('click', e => {
+      if (!this.container.contains(e.target)) this._close();
+    });
+  }
+  _toggle() {
+    const open = this.dropdown.classList.contains('open');
+    // close all others
+    document.querySelectorAll('.ms-dropdown.open').forEach(d => d.classList.remove('open'));
+    document.querySelectorAll('.ms-trigger.open').forEach(t => t.classList.remove('open'));
+    if (!open) { this.dropdown.classList.add('open'); this.trigger.classList.add('open'); this._searchEl.focus(); }
+  }
+  _close() { this.dropdown.classList.remove('open'); this.trigger.classList.remove('open'); }
+  _renderList(q) {
+    const items = q ? this.allItems.filter(v => v.toLowerCase().includes(q)) : this.allItems;
+    if (!items.length) { this._listEl.innerHTML = '<div class="ms-empty">Ничего не найдено</div>'; return; }
+    this._listEl.innerHTML = '';
+    items.forEach(v => {
+      const item = document.createElement('label');
+      item.className = 'ms-item';
+      const cb = document.createElement('input'); cb.type = 'checkbox'; cb.checked = this.selected.has(v);
+      cb.addEventListener('change', e => { e.stopPropagation(); if(cb.checked) this.selected.add(v); else this.selected.delete(v); this._updateTrigger(); this.onChange(); });
+      item.appendChild(cb);
+      const span = document.createElement('span'); span.textContent = v;
+      item.appendChild(span);
+      this._listEl.appendChild(item);
+    });
+  }
+  _updateTrigger() {
+    const lbl = this.trigger.querySelector('.ms-trigger-label');
+    let badge = this.trigger.querySelector('.ms-badge');
+    const n = this.selected.size;
+    if (n === 0) { lbl.textContent = this.placeholder; if(badge) badge.remove(); }
+    else {
+      const names = [...this.selected];
+      lbl.textContent = n === 1 ? names[0] : `${names[0]} +${n-1}`;
+      if (!badge) { badge = document.createElement('span'); badge.className = 'ms-badge'; this.trigger.insertBefore(badge, this.trigger.querySelector('.ms-arrow')); }
+      badge.textContent = n;
+    }
+  }
+  setItems(items) {
+    // keep valid selections
+    this.selected = new Set([...this.selected].filter(v => items.includes(v)));
+    this.allItems = items;
+    this._renderList('');
+    this._updateTrigger();
+  }
+  getSelected() { return this.selected; }
+  clear() { this.selected.clear(); this._renderList(''); this._updateTrigger(); }
+}
 
-// ─── DATE HELPERS ───────────────────────────────────────────────
+// ═══════════════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════════════
+let allData = [], today = null, gMinDate = null;
+const DAY_W = 24;
+let msSubdiv, msDK, msStage, msStatus, msAssign;
+
+// ═══════════════════════════════════════════════════
+//  DATE HELPERS
+// ═══════════════════════════════════════════════════
 function parseDate(v) {
   if (!v) return null;
   if (v instanceof Date) return v;
   if (typeof v === 'number') return new Date(Math.round((v-25569)*86400*1000));
   const dot = (v+'').split('.');
-  if (dot.length===3) return new Date(+dot[2], +dot[1]-1, +dot[0]);
-  const d = new Date(v);
-  return isNaN(d) ? null : d;
+  if (dot.length===3) return new Date(+dot[2],+dot[1]-1,+dot[0]);
+  const d = new Date(v); return isNaN(d)?null:d;
 }
-function fmtDate(d) {
-  if (!d) return '—';
-  return d.toLocaleDateString('ru-RU',{day:'2-digit',month:'2-digit',year:'numeric'});
-}
+function fmtDate(d) { return d ? d.toLocaleDateString('ru-RU',{day:'2-digit',month:'2-digit',year:'numeric'}) : '—'; }
 function daysBetween(a,b) { return Math.floor((b-a)/86400000); }
 
-// ─── STATUS ─────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════
+//  STATUS
+// ═══════════════════════════════════════════════════
+function normalizeStatus(s) {
+  if (!s) return 'план';
+  const v = s.toLowerCase().trim();
+  if (v.includes('выполн')) return 'выполнено';
+  if (v.includes('работ'))  return 'в работе';
+  return 'план';
+}
 function computeStatus(task) {
   if (task.completedDate) {
     if (task.end) {
@@ -315,494 +386,407 @@ function computeStatus(task) {
   }
   return task.statusRaw;
 }
-function normalizeStatus(s) {
-  if (!s) return 'план';
-  const v = s.toLowerCase().trim();
-  if (v.includes('выполн')) return 'выполнено';
-  if (v.includes('работ'))  return 'в работе';
-  return 'план';
-}
-function isApproval(task) {
-  const kw = ['утвержд','согласован','форма','приказ','распоряжен'];
-  const n = (task.name||'').toLowerCase();
-  const r = (task.result||'').toLowerCase();
-  return kw.some(k => n.includes(k)||r.includes(k));
-}
 function isActiveOverdue(task) {
   return task.end && task.end < today &&
     task.status !== 'выполнено' && task.status !== 'исполнено' && task.status !== 'просрочено_исп';
 }
 
-// ─── CSV PARSER ──────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════
+//  CSV
+// ═══════════════════════════════════════════════════
 function csvToRows(csv) {
-  const lines = csv.split(/\r?\n/);
-  if (lines.length < 2) return [];
-  const headers = parseCsvLine(lines[0]);
-  const rows = [];
-  for (let i = 1; i < lines.length; i++) {
+  const lines = csv.split(/\r?\n/); if (lines.length<2) return [];
+  const headers = parseCsvLine(lines[0]); const rows = [];
+  for (let i=1;i<lines.length;i++) {
     if (!lines[i].trim()) continue;
-    const vals = parseCsvLine(lines[i]);
-    const row  = {};
-    headers.forEach((h, idx) => { row[h] = vals[idx] !== undefined ? vals[idx] : ''; });
+    const vals = parseCsvLine(lines[i]); const row={};
+    headers.forEach((h,idx)=>{ row[h]=vals[idx]!==undefined?vals[idx]:''; });
     rows.push(row);
   }
   return rows;
 }
 function parseCsvLine(line) {
-  const res = []; let cur = '', inQ = false;
-  for (let i = 0; i < line.length; i++) {
-    const c = line[i];
-    if (c === '"') { if (inQ && line[i+1]==='"') { cur+='"'; i++; } else inQ=!inQ; }
-    else if (c === ',' && !inQ) { res.push(cur.trim()); cur=''; }
-    else cur += c;
+  const res=[]; let cur='',inQ=false;
+  for (let i=0;i<line.length;i++) {
+    const c=line[i];
+    if (c==='"') { if(inQ&&line[i+1]==='"'){cur+='"';i++;}else inQ=!inQ; }
+    else if (c===','&&!inQ) { res.push(cur.trim()); cur=''; }
+    else cur+=c;
   }
-  res.push(cur.trim());
-  return res;
+  res.push(cur.trim()); return res;
 }
 
-// ─── PARSE DATA ──────────────────────────────────────────────────
-function parseData(rows) {
-  if (!rows.length) { alert('Файл пуст или неверный формат'); return; }
-  const keys = Object.keys(rows[0]);
-  const col = (...v) => keys.find(k => v.some(x => k.toLowerCase().includes(x.toLowerCase())));
+// ═══════════════════════════════════════════════════
+//  PARSE DATA
+// ═══════════════════════════════════════════════════
+function splitNames(s) { return (s||'').toString().trim().split(',').map(a=>a.trim()).filter(Boolean); }
 
-  const cDK       = col('Наименование ДК','дк');
-  const cSubdiv   = col('Подразделение','subdivision','подразд');
-  const cStage    = col('Наименование Этапа','этап');
-  const cTask     = col('Наименование задачи','задач');
-  const cStart    = col('Срок начала','начала','начало');
-  const cEnd      = col('Срок Окончания','окончани','конец');
-  const cStatus   = col('Статус','status');
-  const cResult   = col('Требуемый результат','результат');
-  const cToday    = col('Текущий день','текущий');
-  const cComment  = col('Комментарий','comment','коммент');
-  const cAssignee = col('Ответственный','ответств','assignee','исполнитель');
-  const cCompleted= col('Дата исполнения','исполнения','дата испол','completed');
+function parseData(rows) {
+  if (!rows.length) return;
+  const keys = Object.keys(rows[0]);
+  const col = (...v) => keys.find(k => v.some(x=>k.toLowerCase().includes(x.toLowerCase())));
+
+  const cDK=col('Наименование ДК','дк'), cSubdiv=col('Подразделение','подразд'),
+        cStage=col('Наименование Этапа','этап'), cTask=col('Наименование задачи','задач'),
+        cStart=col('Срок начала','начала'), cEnd=col('Срок Окончания','окончани'),
+        cStatus=col('Статус'), cResult=col('Требуемый результат','результат'),
+        cToday=col('Текущий день','текущий'), cComment=col('Комментарий','коммент'),
+        cAssignee=col('Ответственный','ответств','исполнитель'),
+        cCompleted=col('Дата исполнения','исполнения');
 
   if (!cTask) { alert('Не найдена колонка «Наименование задачи»'); return; }
 
-  allData = rows.map(r => ({
-    dk:            (r[cDK]       ||'').toString().trim(),
-    subdiv:        cSubdiv ? (r[cSubdiv]||'').toString().trim() : '',
-    stage:         (r[cStage]    ||'').toString().trim(),
-    name:          (r[cTask]     ||'').toString().trim(),
-    start:         parseDate(r[cStart]),
-    end:           parseDate(r[cEnd]),
-    statusRaw:     normalizeStatus(r[cStatus]),
-    result:        (r[cResult]   ||'').toString().trim(),
-    comment:       cComment   ? (r[cComment]  ||'').toString().trim() : '',
-    assigneeRaw:   cAssignee  ? (r[cAssignee] ||'').toString().trim() : '',
-    assignees:     cAssignee  ? (r[cAssignee] ||'').toString().trim().split(',').map(a=>a.trim()).filter(Boolean) : [],
-    assignee:      cAssignee  ? (r[cAssignee] ||'').toString().trim().split(',').map(a=>a.trim()).filter(Boolean)[0]||'' : '',
-    completedDate: cCompleted ? parseDate(r[cCompleted]) : null,
-    todayRaw:      parseDate(r[cToday])
-  })).filter(r => r.name).map(r => {
-    r.status = computeStatus(r);
-    return r;
-  });
+  allData = rows.map(r => {
+    const subdivRaw = cSubdiv ? (r[cSubdiv]||'').toString().trim() : '';
+    const assigneeRaw = cAssignee ? (r[cAssignee]||'').toString().trim() : '';
+    return {
+      dk:           (r[cDK]||'').toString().trim(),
+      subdivs:      splitNames(subdivRaw),
+      subdiv:       subdivRaw,
+      stage:        (r[cStage]||'').toString().trim(),
+      name:         (r[cTask]||'').toString().trim(),
+      start:        parseDate(r[cStart]),
+      end:          parseDate(r[cEnd]),
+      statusRaw:    normalizeStatus(r[cStatus]),
+      result:       (r[cResult]||'').toString().trim(),
+      comment:      cComment ? (r[cComment]||'').toString().trim() : '',
+      assignees:    splitNames(assigneeRaw),
+      completedDate:cCompleted ? parseDate(r[cCompleted]) : null,
+      todayRaw:     parseDate(r[cToday])
+    };
+  }).filter(r=>r.name).map(r=>{ r.status=computeStatus(r); return r; });
 
-  const todayFromData = allData.find(r => r.todayRaw)?.todayRaw;
-  today = todayFromData || new Date();
+  today = allData.find(r=>r.todayRaw)?.todayRaw || new Date();
   today.setHours(0,0,0,0);
-
-  document.getElementById('todayBadge').innerHTML = `Текущий день: <b>${fmtDate(today)}</b>`;
-  document.getElementById('loadingState').style.display = 'none';
-  populateFilters();
+  document.getElementById('todayBadge').innerHTML=`Текущий день: <b>${fmtDate(today)}</b>`;
+  document.getElementById('loadingState').style.display='none';
+  initFilters();
   renderGantt();
-  // Auto-scroll to today after first render
-  setTimeout(scrollToToday, 150);
+  setTimeout(scrollToToday, 200);
 }
 
-// ─── FILTERS ─────────────────────────────────────────────────────
-function populateFilters() {
-  // Подразделения
-  const subdivs = [...new Set(allData.map(r=>r.subdiv).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'ru'));
-  const subSel = document.getElementById('subdivFilter');
-  subSel.innerHTML = '<option value="">— Подразделение —</option>';
-  subdivs.forEach(s => subSel.innerHTML += `<option value="${s}">${s}</option>`);
-  subSel.onchange = () => { updateDKFilter(); updateStageFilter(); renderGantt(); };
+// ═══════════════════════════════════════════════════
+//  FILTERS INIT
+// ═══════════════════════════════════════════════════
+function initFilters() {
+  msSubdiv = new MultiSelect('msSubdiv','Подразделение', onFilterChange);
+  msDK     = new MultiSelect('msDK',    'Наименование ДК', onFilterChange);
+  msStage  = new MultiSelect('msStage', 'Этап', onFilterChange);
+  msStatus = new MultiSelect('msStatus','Статус', onFilterChange);
+  msAssign = new MultiSelect('msAssign','Ответственный', onFilterChange);
 
-  // ДК
-  const dks = [...new Set(allData.map(r=>r.dk).filter(Boolean))];
-  const dkSel = document.getElementById('dkFilter');
-  dkSel.innerHTML = '<option value="">— Наименование ДК —</option>';
-  dks.forEach(d => dkSel.innerHTML += `<option value="${d}">${d}</option>`);
-  if (dks.length===1) dkSel.value = dks[0];
-  dkSel.onchange = () => { updateStageFilter(); renderGantt(); };
+  // status items fixed
+  msStatus.setItems(['✅ Выполнено','🔄 В работе','📋 План','⚠️ Выполнено с просрочкой','🔴 Просрочено (не завершены)']);
+  refreshDependentFilters();
+}
 
-  document.getElementById('stageFilter').onchange = renderGantt;
-  document.getElementById('statusFilter').onchange = renderGantt;
+function onFilterChange() { refreshDependentFilters(); renderGantt(); }
 
-  // Ответственные — разбиваем по каждому имени
+function refreshDependentFilters() {
+  const selSubdivs = msSubdiv ? msSubdiv.getSelected() : new Set();
+  const selDKs     = msDK     ? msDK.getSelected()     : new Set();
+
+  // Подразделения — все уникальные из всех задач
+  const allSubdivs = [...new Set(allData.flatMap(r=>r.subdivs).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'ru'));
+  msSubdiv && msSubdiv.setItems(allSubdivs);
+
+  // ДК — фильтруем по подразделению если выбрано
+  let forDK = allData;
+  if (selSubdivs.size) forDK = forDK.filter(r=>r.subdivs.some(s=>selSubdivs.has(s)));
+  const dkList = [...new Set(forDK.map(r=>r.dk).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'ru'));
+  msDK && msDK.setItems(dkList);
+
+  // Этапы — фильтруем по подразделению + ДК
+  let forStage = forDK;
+  if (selDKs.size) forStage = forStage.filter(r=>selDKs.has(r.dk));
+  const stageList = [...new Set(forStage.map(r=>r.stage).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'ru'));
+  msStage && msStage.setItems(stageList);
+
+  // Ответственные
   const assigneeSet = new Set();
-  allData.forEach(r => (r.assignees||[]).forEach(a => { if(a) assigneeSet.add(a); }));
-  const assignees = [...assigneeSet].sort((a,b)=>a.localeCompare(b,'ru'));
-  const aSel = document.getElementById('assigneeFilter');
-  aSel.innerHTML = '<option value="">Все ответственные</option>';
-  assignees.forEach(a => aSel.innerHTML += `<option value="${a}">${a}</option>`);
-  aSel.onchange = renderGantt;
-
-  updateStageFilter();
+  allData.forEach(r=>r.assignees.forEach(a=>{ if(a) assigneeSet.add(a); }));
+  const assigneeList = [...assigneeSet].sort((a,b)=>a.localeCompare(b,'ru'));
+  msAssign && msAssign.setItems(assigneeList);
 }
 
-function updateDKFilter() {
-  const subdiv = document.getElementById('subdivFilter').value;
-  const filtered = subdiv ? allData.filter(r => r.subdiv === subdiv) : allData;
-  const dks = [...new Set(filtered.map(r=>r.dk).filter(Boolean))];
-  const dkSel = document.getElementById('dkFilter');
-  const prev = dkSel.value;
-  dkSel.innerHTML = '<option value="">— Наименование ДК —</option>';
-  dks.forEach(d => dkSel.innerHTML += `<option value="${d}">${d}</option>`);
-  if (dks.includes(prev)) dkSel.value = prev;
-}
-
-function updateStageFilter() {
-  const dk = document.getElementById('dkFilter').value;
-  const subdiv = document.getElementById('subdivFilter').value;
-  let filtered = allData;
-  if (subdiv) filtered = filtered.filter(r => r.subdiv === subdiv);
-  if (dk)     filtered = filtered.filter(r => r.dk === dk);
-  const stages = [...new Set(filtered.map(r=>r.stage).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'ru'));
-  const sel = document.getElementById('stageFilter');
-  const prev = sel.value;
-  sel.innerHTML = '<option value="">Все этапы</option>';
-  stages.forEach(s => sel.innerHTML += `<option value="${s}">${s}</option>`);
-  if (stages.includes(prev)) sel.value = prev;
-}
+// ═══════════════════════════════════════════════════
+//  STATUS LABEL MAPPING
+// ═══════════════════════════════════════════════════
+const STATUS_LABEL_TO_KEY = {
+  '✅ Выполнено': 'выполнено',
+  '🔄 В работе': 'в работе',
+  '📋 План': 'план',
+  '⚠️ Выполнено с просрочкой': 'просрочено_исп',
+  '🔴 Просрочено (не завершены)': '__overdue__'
+};
 
 function getFiltered() {
-  const subdiv   = document.getElementById('subdivFilter').value;
-  const dk       = document.getElementById('dkFilter').value;
-  const stage    = document.getElementById('stageFilter').value;
-  const status   = document.getElementById('statusFilter').value;
-  const assignee = document.getElementById('assigneeFilter').value;
-  const search   = document.getElementById('searchInput').value.trim().toLowerCase();
+  const selSubdivs = msSubdiv ? msSubdiv.getSelected() : new Set();
+  const selDKs     = msDK     ? msDK.getSelected()     : new Set();
+  const selStages  = msStage  ? msStage.getSelected()  : new Set();
+  const selStatuses= msStatus ? msStatus.getSelected() : new Set();
+  const selAssigns = msAssign ? msAssign.getSelected() : new Set();
+  const search = document.getElementById('searchInput').value.trim().toLowerCase();
+
+  // map status labels to keys
+  const statusKeys = new Set([...selStatuses].map(l=>STATUS_LABEL_TO_KEY[l]).filter(Boolean));
+  const wantOverdue = statusKeys.has('__overdue__');
 
   return allData.filter(r => {
-    if (subdiv   && r.subdiv   !== subdiv)   return false;
-    if (dk       && r.dk       !== dk)       return false;
-    if (stage    && r.stage    !== stage)    return false;
-    if (assignee && !(r.assignees||[]).includes(assignee)) return false;
-    if (status === '__overdue__') {
-      if (!isActiveOverdue(r)) return false;
-    } else if (status === 'выполнено') {
-      if (r.status !== 'выполнено' && r.status !== 'исполнено') return false;
-    } else if (status && r.status !== status) return false;
+    if (selSubdivs.size && !r.subdivs.some(s=>selSubdivs.has(s))) return false;
+    if (selDKs.size     && !selDKs.has(r.dk))    return false;
+    if (selStages.size  && !selStages.has(r.stage)) return false;
+    if (selAssigns.size && !r.assignees.some(a=>selAssigns.has(a))) return false;
+    if (statusKeys.size) {
+      const matchesOverdue = wantOverdue && isActiveOverdue(r);
+      const matchesStatus  = (statusKeys.has('выполнено') && (r.status==='выполнено'||r.status==='исполнено')) ||
+                             (statusKeys.has('в работе')  && r.status==='в работе' && !isActiveOverdue(r)) ||
+                             (statusKeys.has('план')      && r.status==='план'      && !isActiveOverdue(r)) ||
+                             (statusKeys.has('просрочено_исп') && r.status==='просрочено_исп');
+      if (!matchesOverdue && !matchesStatus) return false;
+    }
     if (search) {
-      const haystack = [r.name, r.dk, r.stage, r.assignee, r.subdiv, r.comment, r.result].join(' ').toLowerCase();
-      if (!haystack.includes(search)) return false;
+      const hay = [r.name,r.dk,r.stage,r.subdiv,r.assignees.join(' '),r.comment,r.result].join(' ').toLowerCase();
+      if (!hay.includes(search)) return false;
     }
     return true;
   });
 }
 
-// ─── STATS ───────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════
+//  STATS
+// ═══════════════════════════════════════════════════
 function updateStats(data) {
-  document.getElementById('statTotal').textContent   = data.length;
-  document.getElementById('statWip').textContent     = data.filter(r=>r.status==='в работе').length;
-  document.getElementById('statDone').textContent    = data.filter(r=>r.status==='выполнено'||r.status==='исполнено').length;
-  const overdue = data.filter(r => r.status==='просрочено_исп' || isActiveOverdue(r)).length;
-  document.getElementById('statOverdue').textContent = overdue;
+  document.getElementById('statTotal').textContent  = data.length;
+  document.getElementById('statWip').textContent    = data.filter(r=>r.status==='в работе'&&!isActiveOverdue(r)).length;
+  document.getElementById('statDone').textContent   = data.filter(r=>r.status==='выполнено'||r.status==='исполнено').length;
+  document.getElementById('statOverdue').textContent= data.filter(r=>r.status==='просрочено_исп'||isActiveOverdue(r)).length;
 }
 
-// ─── HIERARCHY ───────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════
+//  HIERARCHY
+// ═══════════════════════════════════════════════════
 function buildHierarchy(data) {
   const dkMap = {};
   data.forEach(task => {
     const dk = task.dk||'(без ДК)';
-    if (!dkMap[dk]) dkMap[dk] = {name:dk,subdiv:task.subdiv,start:null,end:null,status:'',result:'',comment:'',children:{}};
-    const dkN = dkMap[dk];
-    if (task.start) dkN.start = dkN.start ? new Date(Math.min(dkN.start,task.start)) : task.start;
-    if (task.end)   dkN.end   = dkN.end   ? new Date(Math.max(dkN.end,  task.end))   : task.end;
-    const st = task.stage||'(без этапа)';
-    if (!dkN.children[st]) dkN.children[st]={name:st,start:null,end:null,status:'',result:'',comment:'',children:[]};
-    const stN = dkN.children[st];
-    if (task.start) stN.start = stN.start ? new Date(Math.min(stN.start,task.start)) : task.start;
-    if (task.end)   stN.end   = stN.end   ? new Date(Math.max(stN.end,  task.end))   : task.end;
+    if (!dkMap[dk]) dkMap[dk]={name:dk,subdiv:task.subdiv,subdivs:task.subdivs,start:null,end:null,status:'',result:'',comment:'',assignees:[],children:{}};
+    const dkN=dkMap[dk];
+    if (task.start) dkN.start=dkN.start?new Date(Math.min(dkN.start,task.start)):task.start;
+    if (task.end)   dkN.end  =dkN.end  ?new Date(Math.max(dkN.end,  task.end))  :task.end;
+    const st=task.stage||'(без этапа)';
+    if (!dkN.children[st]) dkN.children[st]={name:st,start:null,end:null,status:'',result:'',comment:'',assignees:[],children:[]};
+    const stN=dkN.children[st];
+    if (task.start) stN.start=stN.start?new Date(Math.min(stN.start,task.start)):task.start;
+    if (task.end)   stN.end  =stN.end  ?new Date(Math.max(stN.end,  task.end))  :task.end;
     stN.children.push(task);
   });
-  return Object.values(dkMap).map(dk => ({...dk, children:Object.values(dk.children)}));
+  return Object.values(dkMap).map(dk=>({...dk,children:Object.values(dk.children)}));
 }
 
-// ─── SCROLL TO TODAY ─────────────────────────────────────────────
+// ═══════════════════════════════════════════════════
+//  SCROLL TO TODAY
+// ═══════════════════════════════════════════════════
 function scrollToToday() {
-  if (!gMinDate || !today) return;
-  const outer = document.getElementById('ganttScrollOuter');
-  if (!outer) return;
-  const leftPanelWidth = 400;
-  const todayOff = daysBetween(gMinDate, today);
-  const px = todayOff * DAY_W + DAY_W / 2;
-  const viewWidth = outer.clientWidth - leftPanelWidth;
-  outer.scrollLeft = Math.max(0, px - viewWidth / 2);
+  if (!gMinDate||!today) return;
+  const outer=document.getElementById('ganttScrollOuter'); if(!outer) return;
+  const off=daysBetween(gMinDate,today);
+  const px=off*DAY_W+DAY_W/2;
+  outer.scrollLeft=Math.max(0, px-(outer.clientWidth-560)/2);
 }
 
-// ─── RENDER ──────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════
+//  RENDER
+// ═══════════════════════════════════════════════════
 function renderGantt() {
-  const data = getFiltered();
-  const container   = document.getElementById('ganttContainer');
-  const emptyState  = document.getElementById('emptyState');
-
+  const data=getFiltered();
+  const container=document.getElementById('ganttContainer');
+  const emptyState=document.getElementById('emptyState');
   updateStats(data);
-
   if (!data.length) { container.style.display='none'; emptyState.style.display='block'; return; }
   container.style.display='block'; emptyState.style.display='none';
 
-  const starts = data.map(r=>r.start).filter(Boolean);
-  const ends   = data.map(r=>r.end).filter(Boolean);
+  const starts=data.map(r=>r.start).filter(Boolean);
+  const ends=data.map(r=>r.end).filter(Boolean);
   if (!starts.length||!ends.length) { container.style.display='none'; return; }
 
-  let minDate = new Date(Math.min(...starts));
-  let maxDate = new Date(Math.max(...ends));
-  minDate.setDate(minDate.getDate()-3);
-  maxDate.setDate(maxDate.getDate()+35);
+  let minDate=new Date(Math.min(...starts)); let maxDate=new Date(Math.max(...ends));
+  minDate.setDate(minDate.getDate()-3); maxDate.setDate(maxDate.getDate()+35);
   minDate.setHours(0,0,0,0); maxDate.setHours(0,0,0,0);
-  gMinDate = minDate;
+  gMinDate=minDate;
+  const totalDays=Math.ceil((maxDate-minDate)/86400000);
+  const chartWidth=totalDays*DAY_W;
 
-  const totalDays  = Math.ceil((maxDate-minDate)/86400000);
-  const chartWidth = totalDays*DAY_W;
+  const hierarchy=buildHierarchy(data);
+  const wrap=document.getElementById('ganttWrap'); wrap.innerHTML='';
 
-  const hierarchy = buildHierarchy(data);
-  const wrap = document.getElementById('ganttWrap');
-  wrap.innerHTML = '';
+  const leftPanel=document.createElement('div'); leftPanel.className='gantt-left';
+  const rightPanel=document.createElement('div'); rightPanel.className='gantt-right';
+  rightPanel.style.width=chartWidth+'px';
 
-  const leftPanel  = document.createElement('div'); leftPanel.className  = 'gantt-left';
-  const rightPanel = document.createElement('div'); rightPanel.className = 'gantt-right';
-  rightPanel.style.width = chartWidth+'px';
-
-  // Headers
-  const lH = document.createElement('div'); lH.className='gantt-header-cell'; lH.textContent='Наименование задачи';
+  const lH=document.createElement('div'); lH.className='gantt-header-cell'; lH.textContent='Наименование задачи';
   leftPanel.appendChild(lH);
-  const rH = document.createElement('div'); rH.className='gantt-timeline-header'; rH.style.width=chartWidth+'px';
-  buildTimelineHeader(rH, minDate, totalDays);
+  const rH=document.createElement('div'); rH.className='gantt-timeline-header'; rH.style.width=chartWidth+'px';
+  buildTimelineHeader(rH,minDate,totalDays);
   rightPanel.appendChild(rH);
 
-  // Today line in header
-  const todayOff = daysBetween(minDate, today);
-  if (todayOff>=0 && todayOff<=totalDays) {
-    const tl = document.createElement('div'); tl.className='today-line';
-    tl.style.left=(todayOff*DAY_W+DAY_W/2)+'px'; tl.style.zIndex='9';
-    rH.appendChild(tl);
+  const todayOff=daysBetween(minDate,today);
+  if (todayOff>=0&&todayOff<=totalDays) {
+    const tl=document.createElement('div'); tl.className='today-line';
+    tl.style.left=(todayOff*DAY_W+DAY_W/2)+'px'; tl.style.zIndex='9'; rH.appendChild(tl);
   }
 
-  // Flatten
-  const flat = [];
-  (function flatten(nodes, lvl) {
-    nodes.forEach(n => { flat.push({node:n,level:lvl}); if(n.children) flatten(n.children,lvl+1); });
-  })(hierarchy, 0);
+  const flat=[];
+  (function fl(nodes,lvl){ nodes.forEach(n=>{ flat.push({node:n,level:lvl}); if(n.children) fl(n.children,lvl+1); }); })(hierarchy,0);
 
-  const meta = flat.map(({node,level}) => {
-    const lRow = document.createElement('div');
-    const rRow = document.createElement('div');
-    if      (level===0) { lRow.className='task-row dk-row';       rRow.className='gantt-chart-row dk-row'; }
-    else if (level===1) { lRow.className='task-row stage-row';    rRow.className='gantt-chart-row stage-row'; }
-    else                { lRow.className='task-row task-row-item'; rRow.className='gantt-chart-row'; }
+  const meta=flat.map(({node,level})=>{
+    const lRow=document.createElement('div'), rRow=document.createElement('div');
+    if      (level===0){lRow.className='task-row dk-row';       rRow.className='gantt-chart-row dk-row';}
+    else if (level===1){lRow.className='task-row stage-row';    rRow.className='gantt-chart-row stage-row';}
+    else               {lRow.className='task-row task-row-item';rRow.className='gantt-chart-row';}
     return {lRow,rRow,node,level};
   });
 
-  meta.forEach(({lRow,rRow,node,level},i) => {
-    // Grid lines
-    for (let d=0; d<totalDays; d++) {
-      const date = new Date(minDate.getTime()+d*86400000);
-      const dow  = date.getDay();
-      const gl   = document.createElement('div');
-      gl.className='grid-line'; gl.style.left=(d*DAY_W)+'px';
-      if (dow===0||dow===6) { gl.classList.add('weekend'); gl.style.width=DAY_W+'px'; }
+  meta.forEach(({lRow,rRow,node,level},i)=>{
+    // grid
+    for (let d=0;d<totalDays;d++) {
+      const date=new Date(minDate.getTime()+d*86400000), dow=date.getDay();
+      const gl=document.createElement('div'); gl.className='grid-line'; gl.style.left=(d*DAY_W)+'px';
+      if (dow===0||dow===6){gl.classList.add('weekend');gl.style.width=DAY_W+'px';}
       else if (date.getDate()===1) gl.classList.add('month-start');
       rRow.appendChild(gl);
     }
-
-    // Today line
-    if (todayOff>=0 && todayOff<=totalDays) {
-      const tl = document.createElement('div'); tl.className='today-line';
-      tl.style.left=(todayOff*DAY_W+DAY_W/2)+'px';
-      rRow.appendChild(tl);
+    if (todayOff>=0&&todayOff<=totalDays) {
+      const tl=document.createElement('div'); tl.className='today-line';
+      tl.style.left=(todayOff*DAY_W+DAY_W/2)+'px'; rRow.appendChild(tl);
     }
 
-    // Bar
-    if (node.start && node.end) {
-      const startOff = Math.max(0, daysBetween(minDate,node.start));
-      const endOff   = daysBetween(minDate,node.end);
-      const duration = Math.max(1, endOff-startOff+1);
-      const bLeft    = startOff*DAY_W+2;
-      const bWidth   = duration*DAY_W-4;
+    // bar
+    if (node.start&&node.end) {
+      const sOff=Math.max(0,daysBetween(minDate,node.start));
+      const eOff=daysBetween(minDate,node.end);
+      const dur=Math.max(1,eOff-sOff+1);
+      const bL=sOff*DAY_W+2, bW=dur*DAY_W-4;
+      const bar=document.createElement('div'); bar.className='bar';
+      const norm=node.status||'', ov=isActiveOverdue(node);
 
-      const bar = document.createElement('div'); bar.className='bar';
-      const norm = node.status||'';
-      const app  = isApproval(node);
-      const overdueActive = isActiveOverdue(node);
-
-      if      (level===0)               bar.classList.add('bar-dk');
-      else if (level===1)               bar.classList.add('bar-stage');
-      else if (app)                     bar.classList.add('bar-approval');
+      if      (level===0)                              bar.classList.add('bar-dk');
+      else if (level===1)                              bar.classList.add('bar-stage');
       else if (norm==='выполнено'||norm==='исполнено') bar.classList.add('bar-done');
-      else if (norm==='просрочено_исп') bar.classList.add('bar-overdue');
-      else if (norm==='в работе')       bar.classList.add(overdueActive?'bar-overdue':'bar-wip');
-      else                              bar.classList.add(overdueActive?'bar-overdue':'bar-plan');
+      else if (norm==='просрочено_исп')                bar.classList.add('bar-overdue');
+      else if (norm==='в работе')                      bar.classList.add(ov?'bar-overdue':'bar-wip');
+      else                                             bar.classList.add(ov?'bar-overdue':'bar-plan');
 
-      bar.style.left=bLeft+'px'; bar.style.width=bWidth+'px';
-
-      if (level>=1) {
-        const bl = document.createElement('div'); bl.className='bar-label'; bl.textContent=node.name;
-        bar.appendChild(bl);
-      }
-      bar.addEventListener('mouseenter', e=>showTooltip(e,node));
-      bar.addEventListener('mousemove',  e=>moveTooltip(e));
-      bar.addEventListener('mouseleave', hideTooltip);
+      bar.style.left=bL+'px'; bar.style.width=bW+'px';
+      if (level>=1) { const bl=document.createElement('div'); bl.className='bar-label'; bl.textContent=node.name; bar.appendChild(bl); }
+      bar.addEventListener('mouseenter',e=>showTip(e,node));
+      bar.addEventListener('mousemove', e=>moveTip(e));
+      bar.addEventListener('mouseleave',hideTip);
       rRow.appendChild(bar);
 
-      let afterX = bLeft+bWidth+8;
-      if (node.comment && level>=1) {
-        const cb = document.createElement('div'); cb.className='bar-comment';
-        cb.style.left=afterX+'px';
-        cb.innerHTML='💬 '+node.comment;
-        cb.title=node.comment;
-        rRow.appendChild(cb);
-        afterX += Math.min(node.comment.length*7+38, 248)+8;
+      let afterX=bL+bW+8;
+      if (node.comment&&level>=1) {
+        const cb=document.createElement('div'); cb.className='bar-comment';
+        cb.style.left=afterX+'px'; cb.innerHTML='💬 '+node.comment; cb.title=node.comment;
+        rRow.appendChild(cb); afterX+=Math.min(node.comment.length*7+38,248)+8;
       }
-      if (node.result && level===2) {
-        const db = document.createElement('div'); db.className='bar-closing-doc';
-        db.style.left=afterX+'px';
-        db.innerHTML='📄 '+node.result;
-        db.title='Закрывающий документ: '+node.result;
+      if (node.result&&level===2) {
+        const db=document.createElement('div'); db.className='bar-closing-doc';
+        db.style.left=afterX+'px'; db.innerHTML='📄 '+node.result; db.title=node.result;
         rRow.appendChild(db);
-      }
-      if (app && level===2) {
-        const mk = document.createElement('div'); mk.className='approval-marker'; mk.textContent='✓';
-        const mOff = Math.min(endOff+1,totalDays-1);
-        mk.style.left=(mOff*DAY_W+2)+'px';
-        mk.addEventListener('mouseenter', e=>showTooltip(e,node,true));
-        mk.addEventListener('mousemove',  e=>moveTooltip(e));
-        mk.addEventListener('mouseleave', hideTooltip);
-        rRow.appendChild(mk);
       }
     }
 
-    // Left row
-    const hasKids = node.children && node.children.length>0;
+    // left panel
+    const hasKids=node.children&&node.children.length>0;
     if (hasKids) {
-      const ic = document.createElement('span'); ic.className='collapse-icon'; ic.textContent='▼';
+      const ic=document.createElement('span'); ic.className='collapse-icon'; ic.textContent='▼';
       lRow.appendChild(ic);
       let collapsed=false;
-      lRow.addEventListener('click', ()=>{
+      lRow.addEventListener('click',()=>{
         collapsed=!collapsed; ic.style.transform=collapsed?'rotate(-90deg)':'';
         let j=i+1;
-        while(j<meta.length && meta[j].level>level) {
-          meta[j].lRow.style.display=collapsed?'none':'';
-          meta[j].rRow.style.display=collapsed?'none':'';
-          j++;
-        }
+        while(j<meta.length&&meta[j].level>level){ meta[j].lRow.style.display=collapsed?'none':''; meta[j].rRow.style.display=collapsed?'none':''; j++; }
       });
     }
 
-    const lb = document.createElement('div'); lb.className='row-label'; lb.textContent=node.name; lb.title=node.name;
+    const lb=document.createElement('div'); lb.className='row-label'; lb.textContent=node.name; lb.title=node.name;
     lRow.appendChild(lb);
 
-    // Subdiv badge for DK rows
-    if (level===0 && node.subdiv) {
-      const sb = document.createElement('div');
-      sb.style.cssText='font-size:9px;padding:2px 6px;border-radius:10px;background:var(--plan-bg);color:var(--plan);font-weight:700;flex-shrink:0;white-space:nowrap;max-width:100px;overflow:hidden;text-overflow:ellipsis;';
-      sb.textContent=node.subdiv; sb.title=node.subdiv;
-      lRow.appendChild(sb);
+    // subdiv tag on DK rows
+    if (level===0&&node.subdiv) {
+      const sb=document.createElement('div'); sb.className='subdiv-tag';
+      sb.textContent=node.subdiv; sb.title=node.subdiv; lRow.appendChild(sb);
     }
 
     if (level===2) {
-      const norm = node.status||'';
-      const app  = isApproval(node);
-      const overdueActive = isActiveOverdue(node);
-      const pill = document.createElement('div'); pill.className='status-pill';
-      if      (app)                       { pill.classList.add('s-approval'); pill.textContent='УТВЕРЖД.'; }
-      else if (norm==='выполнено')        { pill.classList.add('s-done');     pill.textContent='ГОТОВО'; }
-      else if (norm==='исполнено')        { pill.classList.add('s-done');     pill.textContent='ИСПОЛ.✓'; }
-      else if (norm==='просрочено_исп')   { pill.classList.add('s-overdue');  pill.textContent='ПР.ИСП.'; }
-      else if (norm==='в работе')         {
-        if (overdueActive)                { pill.classList.add('s-overdue');  pill.textContent='ПРОСРОЧ.'; }
-        else                              { pill.classList.add('s-wip');      pill.textContent='В РАБОТЕ'; }
-      } else {
-        if (overdueActive)                { pill.classList.add('s-overdue');  pill.textContent='ПРОСРОЧ.'; }
-        else                              { pill.classList.add('s-plan');     pill.textContent='ПЛАН'; }
-      }
+      const norm=node.status||'', ov=isActiveOverdue(node);
+      const pill=document.createElement('div'); pill.className='status-pill';
+      if      (norm==='выполнено'||norm==='исполнено'){pill.classList.add('s-done');    pill.textContent='ГОТОВО';}
+      else if (norm==='просрочено_исп')               {pill.classList.add('s-overdue'); pill.textContent='ПР.ИСП.';}
+      else if (norm==='в работе') { ov?pill.classList.add('s-overdue')&&(pill.textContent='ПРОСРОЧ.'):pill.classList.add('s-wip')&&(pill.textContent='В РАБОТЕ');
+        if(ov){pill.classList.add('s-overdue');pill.textContent='ПРОСРОЧ.';}else{pill.classList.add('s-wip');pill.textContent='В РАБОТЕ';} }
+      else { if(ov){pill.classList.add('s-overdue');pill.textContent='ПРОСРОЧ.';}else{pill.classList.add('s-plan');pill.textContent='ПЛАН';} }
       lRow.appendChild(pill);
 
       if (node.end) {
-        const dL = Math.ceil((node.end-today)/86400000);
-        const dl = document.createElement('div'); dl.className='days-left';
-        if      (norm==='выполнено'||norm==='исполнено') { dl.textContent='✓'; dl.classList.add('ok'); }
-        else if (norm==='просрочено_исп') {
-          dl.textContent = node.completedDate ? fmtDate(node.completedDate) : '!';
-          dl.classList.add('urgent'); dl.style.fontSize='9px';
-        } else if (dL<0) {
-          dl.textContent=`+${Math.abs(dL)}д`; dl.classList.add('urgent');
-        } else {
-          dl.textContent=`${dL}д`; dL<=3?dl.classList.add('urgent'):dl.classList.add('ok');
-        }
+        const dL=Math.ceil((node.end-today)/86400000);
+        const dl=document.createElement('div'); dl.className='days-left';
+        if      (norm==='выполнено'||norm==='исполнено'){dl.textContent='✓';dl.classList.add('ok');}
+        else if (norm==='просрочено_исп'){dl.textContent=node.completedDate?fmtDate(node.completedDate):'!';dl.classList.add('urgent');dl.style.fontSize='9px';}
+        else if (dL<0){dl.textContent=`+${Math.abs(dL)}д`;dl.classList.add('urgent');}
+        else{dl.textContent=`${dL}д`;dL<=3?dl.classList.add('urgent'):dl.classList.add('ok');}
         lRow.appendChild(dl);
       }
-      if (node.assignees && node.assignees.length) {
-        const as = document.createElement('div');
-        as.style.cssText='font-size:9px;color:var(--text3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:120px;';
-        as.textContent='👤 '+node.assignees.join(', ');
-        as.title=node.assignees.join(', ');
+      if (node.assignees&&node.assignees.length) {
+        const as=document.createElement('div');
+        as.style.cssText='font-size:9px;color:var(--text3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:200px;';
+        as.textContent='👤 '+node.assignees.join(', '); as.title=node.assignees.join(', ');
         lRow.appendChild(as);
       }
     }
 
-    leftPanel.appendChild(lRow);
-    rightPanel.appendChild(rRow);
+    leftPanel.appendChild(lRow); rightPanel.appendChild(rRow);
   });
 
-  wrap.appendChild(leftPanel);
-  wrap.appendChild(rightPanel);
+  wrap.appendChild(leftPanel); wrap.appendChild(rightPanel);
 }
 
-// ─── TIMELINE HEADER ─────────────────────────────────────────────
-function buildTimelineHeader(container, minDate, totalDays) {
-  let curMonth=null, mStart=0;
-  for (let d=0; d<totalDays; d++) {
-    const date  = new Date(minDate.getTime()+d*86400000);
-    const month = date.getMonth();
+// ═══════════════════════════════════════════════════
+//  TIMELINE HEADER
+// ═══════════════════════════════════════════════════
+function buildTimelineHeader(container,minDate,totalDays) {
+  let curMonth=null,mStart=0;
+  for (let d=0;d<totalDays;d++) {
+    const date=new Date(minDate.getTime()+d*86400000), month=date.getMonth();
     if (month!==curMonth) {
-      if (curMonth!==null) {
-        const ml=document.createElement('div'); ml.className='month-label'; ml.style.left=(mStart*DAY_W+4)+'px';
-        ml.textContent=date.toLocaleDateString('ru-RU',{month:'short',year:'numeric'}).toUpperCase();
-        container.appendChild(ml);
-      }
+      if (curMonth!==null){const ml=document.createElement('div');ml.className='month-label';ml.style.left=(mStart*DAY_W+4)+'px';ml.textContent=date.toLocaleDateString('ru-RU',{month:'short',year:'numeric'}).toUpperCase();container.appendChild(ml);}
       curMonth=month; mStart=d;
     }
-    if (d%7===0||date.getDate()===1) {
-      const dl=document.createElement('div'); dl.className='day-label'; dl.style.left=(d*DAY_W+2)+'px';
-      dl.textContent=date.getDate(); container.appendChild(dl);
-    }
+    if (d%7===0||date.getDate()===1){const dl=document.createElement('div');dl.className='day-label';dl.style.left=(d*DAY_W+2)+'px';dl.textContent=date.getDate();container.appendChild(dl);}
   }
-  if (curMonth!==null) {
-    const ml=document.createElement('div'); ml.className='month-label'; ml.style.left=(mStart*DAY_W+4)+'px';
-    const last=new Date(minDate.getTime()+(totalDays-1)*86400000);
-    ml.textContent=last.toLocaleDateString('ru-RU',{month:'short',year:'numeric'}).toUpperCase();
-    container.appendChild(ml);
-  }
+  if (curMonth!==null){const ml=document.createElement('div');ml.className='month-label';ml.style.left=(mStart*DAY_W+4)+'px';const last=new Date(minDate.getTime()+(totalDays-1)*86400000);ml.textContent=last.toLocaleDateString('ru-RU',{month:'short',year:'numeric'}).toUpperCase();container.appendChild(ml);}
 }
 
-// ─── TOOLTIP ─────────────────────────────────────────────────────
-const tooltip = document.getElementById('tooltip');
-
-function showTooltip(e, node) {
-  const norm = node.status||'';
-  const dL   = node.end ? Math.ceil((node.end-today)/86400000) : null;
+// ═══════════════════════════════════════════════════
+//  TOOLTIP
+// ═══════════════════════════════════════════════════
+const tipEl=document.getElementById('tooltip');
+function showTip(e,node) {
+  const norm=node.status||'', dL=node.end?Math.ceil((node.end-today)/86400000):null;
   let stHtml='';
-  if      (norm==='выполнено') stHtml=`<span style="color:var(--done)">● Выполнено</span>`;
-  else if (norm==='исполнено') stHtml=`<span style="color:var(--done)">● Исполнено в срок</span>`;
+  if (norm==='выполнено'||norm==='исполнено') stHtml=`<span style="color:var(--done)">● Выполнено</span>`;
   else if (norm==='в работе')  stHtml=`<span style="color:var(--wip)">● В работе</span>`;
-  else if (norm==='просрочено_исп') stHtml=`<span style="color:var(--overdue)">● Исполнено с просрочкой</span>`;
-  else                         stHtml=`<span style="color:var(--plan)">● План</span>`;
+  else if (norm==='просрочено_исп') stHtml=`<span style="color:var(--overdue)">● Выполнено с просрочкой</span>`;
+  else stHtml=`<span style="color:var(--plan)">● План</span>`;
   if (isActiveOverdue(node)) stHtml=`<span style="color:var(--overdue)">● Просрочено</span>`;
-
   let dHtml='';
   if (dL!==null) {
     if (norm==='выполнено'||norm==='исполнено') dHtml=`<span style="color:var(--done)">Завершено ✓</span>`;
     else if (dL<0) dHtml=`<span style="color:var(--overdue)">Просрочено на ${Math.abs(dL)} дн.</span>`;
-    else           dHtml=`<span style="color:var(--done)">Осталось ${dL} дн.</span>`;
+    else dHtml=`<span style="color:var(--done)">Осталось ${dL} дн.</span>`;
   }
-
-  tooltip.innerHTML = `
+  tipEl.innerHTML=`
     <h4>${node.name}</h4>
     ${node.subdiv?`<div class="tooltip-row"><span class="tooltip-key">Подразделение</span><span class="tooltip-val">${node.subdiv}</span></div>`:''}
     <div class="tooltip-row"><span class="tooltip-key">Статус</span><span class="tooltip-val">${stHtml}</span></div>
@@ -812,35 +796,32 @@ function showTooltip(e, node) {
     ${node.assignees&&node.assignees.length?`<div class="tooltip-row"><span class="tooltip-key">Ответственный</span><span class="tooltip-val">👤 ${node.assignees.join(', ')}</span></div>`:''}
     ${node.completedDate?`<div class="tooltip-row"><span class="tooltip-key">Дата исполнения</span><span class="tooltip-val" style="color:${node.status==='исполнено'?'var(--done)':'var(--overdue)'};">${fmtDate(node.completedDate)}</span></div>`:''}
     ${node.result?`<div class="tooltip-block result">📄 <span><b>Закрывающий документ:</b><br>${node.result}</span></div>`:''}
-    ${node.comment?`<div class="tooltip-block comment">💬 <span><b>Комментарий:</b><br>${node.comment}</span></div>`:''}
-  `;
-  tooltip.style.display='block';
-  moveTooltip(e);
+    ${node.comment?`<div class="tooltip-block comment">💬 <span><b>Комментарий:</b><br>${node.comment}</span></div>`:''}`;
+  tipEl.style.display='block'; moveTip(e);
 }
-function moveTooltip(e) {
-  tooltip.style.left = Math.min(e.clientX+14, window.innerWidth -tooltip.offsetWidth -8)+'px';
-  tooltip.style.top  = Math.min(e.clientY-10, window.innerHeight-tooltip.offsetHeight-8)+'px';
+function moveTip(e){
+  tipEl.style.left=Math.min(e.clientX+14,window.innerWidth-tipEl.offsetWidth-8)+'px';
+  tipEl.style.top=Math.min(e.clientY-10,window.innerHeight-tipEl.offsetHeight-8)+'px';
 }
-function hideTooltip() { tooltip.style.display='none'; }
+function hideTip(){tipEl.style.display='none';}
 
-// ─── AUTO LOAD ───────────────────────────────────────────────────
-const GS_URL = 'https://docs.google.com/spreadsheets/d/1fqgdfF8_w1XeSsYYmLAgYJ5MczJrqFlAY1MpEqnKIr0/export?format=csv&gid=0';
-
-(async function autoLoad() {
+// ═══════════════════════════════════════════════════
+//  AUTO LOAD
+// ═══════════════════════════════════════════════════
+(async function(){
   try {
-    const resp = await fetch(GS_URL);
-    if (!resp.ok) throw new Error('HTTP ' + resp.status);
-    const text = await resp.text();
-    const rows = csvToRows(text);
+    const resp=await fetch('https://docs.google.com/spreadsheets/d/1fqgdfF8_w1XeSsYYmLAgYJ5MczJrqFlAY1MpEqnKIr0/export?format=csv&gid=0');
+    if (!resp.ok) throw new Error('HTTP '+resp.status);
+    const text=await resp.text();
+    const rows=csvToRows(text);
     if (!rows.length) throw new Error('Пустая таблица');
     parseData(rows);
   } catch(err) {
-    document.getElementById('loadingState').innerHTML = `
+    document.getElementById('loadingState').innerHTML=`
       <div style="font-size:36px;margin-bottom:12px;">⚠️</div>
       <p style="color:var(--overdue);font-weight:600;">Не удалось загрузить данные</p>
       <p style="font-size:12px;margin-top:8px;color:var(--text3);">${err.message}</p>
-      <p style="font-size:12px;margin-top:4px;color:var(--text3);">Проверьте доступ к таблице: Файл → Настройки доступа → «Читатель»</p>
-    `;
+      <p style="font-size:12px;margin-top:4px;color:var(--text3);">Проверьте доступ: Файл → Настройки доступа → «Читатель»</p>`;
   }
 })();
 </script>
