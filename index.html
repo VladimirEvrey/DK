@@ -422,6 +422,60 @@ body{font-family:'Geologica',sans-serif;background:var(--bg);color:var(--text);m
   }
 }
 
+/* ── LOGIN OVERLAY ── */
+.login-overlay{
+  position:fixed;inset:0;z-index:9999;
+  background:var(--bg);
+  display:flex;align-items:center;justify-content:center;
+  padding:20px;
+}
+.login-card{
+  background:var(--surface);border:1.5px solid var(--border2);
+  border-radius:20px;padding:36px 40px;width:100%;max-width:420px;
+  box-shadow:0 8px 40px rgba(20,40,25,.14);
+}
+.login-logo{font-size:14px;font-weight:700;color:var(--text);margin-bottom:4px;}
+.login-logo span{color:var(--accent);}
+.login-subtitle{font-size:12px;color:var(--text3);margin-bottom:28px;}
+.login-label{font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;}
+.login-select,.login-input{
+  width:100%;padding:10px 13px;border:1.5px solid var(--border2);border-radius:10px;
+  font-family:'Geologica',sans-serif;font-size:13px;color:var(--text);
+  background:var(--surface2);outline:none;transition:border-color .2s;
+  appearance:none;-webkit-appearance:none;
+}
+.login-select-wrap{position:relative;}
+.login-select-wrap::after{
+  content:'▼';position:absolute;right:12px;top:50%;transform:translateY(-50%);
+  font-size:9px;color:var(--text3);pointer-events:none;
+}
+.login-select:focus,.login-input:focus{border-color:var(--accent);}
+.login-field{margin-bottom:16px;}
+.login-btn{
+  width:100%;padding:11px;background:var(--accent);color:#fff;border:none;
+  border-radius:10px;font-family:'Geologica',sans-serif;font-size:13px;font-weight:700;
+  cursor:pointer;margin-top:8px;box-shadow:0 2px 10px rgba(45,106,79,.28);
+  transition:opacity .2s;
+}
+.login-btn:hover{opacity:.88;}
+.login-error{
+  font-size:12px;color:var(--overdue);margin-top:10px;text-align:center;
+  min-height:18px;font-weight:600;
+}
+.login-user-badge{
+  display:flex;align-items:center;gap:8px;
+  background:var(--surface2);border:1.5px solid var(--border2);
+  border-radius:8px;padding:5px 10px;font-size:12px;color:var(--text2);
+  white-space:nowrap;box-shadow:var(--shadow);
+}
+.login-user-badge b{color:var(--accent);}
+.logout-btn{
+  background:none;border:1.5px solid var(--border2);border-radius:6px;
+  padding:3px 8px;font-size:11px;color:var(--text3);cursor:pointer;
+  font-family:'Geologica',sans-serif;transition:border-color .15s,color .15s;
+}
+.logout-btn:hover{border-color:var(--overdue);color:var(--overdue);}
+
 /* ═══════════════════════════════════
    VERY SMALL SCREENS (≤ 480px)
 ═══════════════════════════════════ */
@@ -456,6 +510,28 @@ body{font-family:'Geologica',sans-serif;background:var(--bg);color:var(--text);m
 </head>
 <body>
 
+<!-- ── LOGIN OVERLAY ── -->
+<div class="login-overlay" id="loginOverlay">
+  <div class="login-card">
+    <div class="login-logo">Консолидированный календарь<span> Дорожных карт</span></div>
+    <div class="login-subtitle">Введите данные для входа</div>
+    <div class="login-field">
+      <div class="login-label">Подразделение</div>
+      <div class="login-select-wrap">
+        <select class="login-select" id="loginSubdivSelect">
+          <option value="">— выберите подразделение —</option>
+        </select>
+      </div>
+    </div>
+    <div class="login-field">
+      <div class="login-label">Пароль</div>
+      <input class="login-input" type="password" id="loginPassword" placeholder="Введите пароль…" onkeydown="if(event.key==='Enter')doLogin()">
+    </div>
+    <button class="login-btn" onclick="doLogin()">Войти</button>
+    <div class="login-error" id="loginError"></div>
+  </div>
+</div>
+
 <div class="header">
   <div class="logo">Консолидированный календарь<span> Дорожных карт</span></div>
   <!-- Кнопка-тоггл (только на мобильном) -->
@@ -476,6 +552,10 @@ body{font-family:'Geologica',sans-serif;background:var(--bg);color:var(--text);m
     <button class="goto-today-btn" onclick="scrollToToday()">📍 Сегодня</button>
   </div>
   <div class="today-badge" id="todayBadge">Текущий день: <b>—</b></div>
+  <div class="login-user-badge" id="userBadge" style="display:none">
+    👤 <b id="userBadgeName"></b>
+    <button class="logout-btn" onclick="doLogout()">Выйти</button>
+  </div>
 </div>
 
 <div class="stats">
@@ -506,6 +586,100 @@ body{font-family:'Geologica',sans-serif;background:var(--bg);color:var(--text);m
 <div class="tooltip" id="tooltip"></div>
 
 <script>
+// ═══════════════════════════════════════════════════
+//  ⚙️  ПАРОЛИ ПОДРАЗДЕЛЕНИЙ — редактируйте здесь
+//  Формат: 'Название подразделения': 'пароль'
+//  Название должно точно совпадать с данными в таблице
+// ═══════════════════════════════════════════════════
+
+const SUBDIV_PASSWORDS = {
+   'Служба цифровизации и DATA EX':   'CAEX1',
+  'Служба вознаграждения и организационной эффективности':   'SVIO',
+   'Служба управления опытом работника':  'SUOR'
+
+};
+
+// Админ-аккаунт — видит все подразделения, фильтры не заблокированы
+const ADMIN_PASSWORD = 'admin2026'; // ← замените на свой пароль
+
+// ── AUTH STATE ──
+const SESSION_KEY = 'dk_auth_subdiv';
+let currentSubdiv = null; // подразделение текущего пользователя
+
+function authInit() {
+  // Восстановить сессию
+  const saved = sessionStorage.getItem(SESSION_KEY);
+  if (saved && SUBDIV_PASSWORDS[saved] !== undefined) {
+    currentSubdiv = saved;
+    showApp();
+  } else {
+    showLogin();
+  }
+}
+
+function showLogin() {
+  currentSubdiv = null;
+  document.getElementById('loginOverlay').style.display = 'flex';
+  document.getElementById('userBadge').style.display = 'none';
+  const sel = document.getElementById('loginSubdivSelect');
+  sel.innerHTML = '<option value="">— выберите подразделение —</option>';
+  // Добавить админа первым
+  const adminOpt = document.createElement('option');
+  adminOpt.value = '__admin__'; adminOpt.textContent = '👑 Администратор (все подразделения)';
+  sel.appendChild(adminOpt);
+  Object.keys(SUBDIV_PASSWORDS).forEach(name => {
+    if (name === '__demo__') return;
+    const opt = document.createElement('option');
+    opt.value = name; opt.textContent = name;
+    sel.appendChild(opt);
+  });
+  if (Object.keys(SUBDIV_PASSWORDS).filter(k => k !== '__demo__').length === 0) {
+    const opt = document.createElement('option');
+    opt.value = '__demo__'; opt.textContent = 'Демо-режим';
+    sel.appendChild(opt);
+  }
+}
+
+function showApp() {
+  document.getElementById('loginOverlay').style.display = 'none';
+  document.getElementById('userBadge').style.display = 'flex';
+  const isAdmin = currentSubdiv === '__admin__';
+  const label = isAdmin ? '👑 Администратор' : currentSubdiv === '__demo__' ? 'Демо-режим' : currentSubdiv;
+  document.getElementById('userBadgeName').textContent = label;
+  // Для обычных пользователей скрыть фильтр подразделений
+  document.getElementById('msSubdiv').style.display = isAdmin ? '' : 'none';
+}
+
+function doLogin() {
+  const subdiv = document.getElementById('loginSubdivSelect').value;
+  const pass   = document.getElementById('loginPassword').value;
+  const errEl  = document.getElementById('loginError');
+  errEl.textContent = '';
+  if (!subdiv) { errEl.textContent = 'Выберите подразделение'; return; }
+  if (!pass)   { errEl.textContent = 'Введите пароль'; return; }
+
+  // Проверка пароля
+  const isAdmin = subdiv === '__admin__';
+  const correctPass = isAdmin ? ADMIN_PASSWORD : SUBDIV_PASSWORDS[subdiv];
+  if (correctPass !== pass) {
+    errEl.textContent = 'Неверный пароль';
+    document.getElementById('loginPassword').value = '';
+    return;
+  }
+  currentSubdiv = subdiv;
+  sessionStorage.setItem(SESSION_KEY, subdiv);
+  showApp();
+  if (allData.length) renderGantt();
+}
+
+function doLogout() {
+  sessionStorage.removeItem(SESSION_KEY);
+  currentSubdiv = null;
+  document.getElementById('loginPassword').value = '';
+  document.getElementById('loginError').textContent = '';
+  showLogin();
+}
+
 // ── MOBILE FILTER TOGGLE ──
 function toggleMobileFilters() {
   const controls = document.getElementById('headerControls');
@@ -740,9 +914,36 @@ function parseData(rows) {
   today.setHours(0,0,0,0);
   document.getElementById('todayBadge').innerHTML=`Текущий день: <b>${fmtDate(today)}</b>`;
   document.getElementById('loadingState').style.display='none';
+
+  // Заполнить список подразделений в форме входа из реальных данных таблицы
+  populateLoginSubdivs();
+
   initFilters();
   renderGantt();
   setTimeout(scrollToToday, 200);
+}
+
+// Заполнить дропдаун входа подразделениями из таблицы (только те, у которых есть пароль)
+function populateLoginSubdivs() {
+  const sel = document.getElementById('loginSubdivSelect');
+  const allSubdivs = [...new Set(allData.flatMap(r=>r.subdivs).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'ru'));
+  sel.innerHTML = '<option value="">— выберите подразделение —</option>';
+  // Админ всегда первым
+  const adminOpt = document.createElement('option');
+  adminOpt.value = '__admin__'; adminOpt.textContent = '👑 Администратор (все подразделения)';
+  sel.appendChild(adminOpt);
+  // Подразделения из таблицы у которых есть пароль
+  allSubdivs.forEach(name => {
+    if (SUBDIV_PASSWORDS[name] === undefined) return;
+    const opt = document.createElement('option');
+    opt.value = name; opt.textContent = name;
+    sel.appendChild(opt);
+  });
+  if (sel.options.length === 2) { // только заголовок + админ — пароли не настроены
+    const opt = document.createElement('option');
+    opt.value = '__demo__'; opt.textContent = 'Демо-режим (пароли не настроены)';
+    sel.appendChild(opt);
+  }
 }
 
 // ═══════════════════════════════════════════════════
@@ -807,6 +1008,10 @@ function getFiltered() {
   const wantOverdue = statusKeys.has('__overdue__');
 
   return allData.filter(r => {
+    // Фильтр по подразделению: обычный пользователь видит только своё, админ — всё
+    if (currentSubdiv && currentSubdiv !== '__admin__' && currentSubdiv !== '__demo__') {
+      if (!r.subdivs.some(s => s === currentSubdiv)) return false;
+    }
     if (selSubdivs.size && !r.subdivs.some(s=>selSubdivs.has(s))) return false;
     if (selDKs.size     && !selDKs.has(r.dk))    return false;
     if (selStages.size  && !selStages.has(r.stage)) return false;
@@ -1099,6 +1304,9 @@ function hideTip(){tipEl.style.display='none';}
 // ═══════════════════════════════════════════════════
 //  AUTO LOAD
 // ═══════════════════════════════════════════════════
+// Показать форму входа сразу (до загрузки данных)
+authInit();
+
 (async function(){
   try {
     const resp=await fetch('https://docs.google.com/spreadsheets/d/1fqgdfF8_w1XeSsYYmLAgYJ5MczJrqFlAY1MpEqnKIr0/export?format=csv&gid=0');
@@ -1107,6 +1315,8 @@ function hideTip(){tipEl.style.display='none';}
     const rows=csvToRows(text);
     if (!rows.length) throw new Error('Пустая таблица');
     parseData(rows);
+    // Если пользователь уже вошёл (сессия восстановлена) — перерисовать с его фильтром
+    if (currentSubdiv) renderGantt();
   } catch(err) {
     document.getElementById('loadingState').innerHTML=`
       <div style="font-size:36px;margin-bottom:12px;">⚠️</div>
