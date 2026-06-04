@@ -34,6 +34,19 @@ body{font-family:'Geologica',sans-serif;background:var(--bg);color:var(--text);m
 .logo span{color:var(--accent);}
 .header-controls{display:flex;gap:7px;align-items:center;flex-wrap:wrap;flex:1;}
 
+/* ── MOBILE FILTER TOGGLE ── */
+.mobile-filter-toggle{
+  display:none;
+  background:var(--surface2);border:1.5px solid var(--border2);
+  border-radius:8px;padding:6px 12px;font-size:12.5px;font-weight:600;
+  color:var(--text);cursor:pointer;white-space:nowrap;box-shadow:var(--shadow);
+  font-family:'Geologica',sans-serif;align-items:center;gap:6px;
+}
+.mobile-filter-toggle .filter-count{
+  background:var(--accent);color:#fff;border-radius:10px;
+  font-size:10px;font-weight:700;padding:1px 6px;
+}
+
 /* ── SEARCH ── */
 .search-wrap{position:relative;display:flex;align-items:center;}
 .search-wrap input{
@@ -203,13 +216,253 @@ body{font-family:'Geologica',sans-serif;background:var(--bg);color:var(--text);m
 ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px;}
 ::-webkit-scrollbar-thumb:hover{background:var(--text3);}
 @keyframes spin{to{transform:rotate(360deg);}}
+
+/* ═══════════════════════════════════
+   MOBILE STYLES  (≤ 768px)
+═══════════════════════════════════ */
+@media (max-width: 768px) {
+
+  /* --- Header --- */
+  .header {
+    padding: 8px 12px;
+    gap: 8px;
+  }
+
+  .logo {
+    font-size: 13px;
+  }
+
+  /* Показываем кнопку-тоггл для фильтров */
+  .mobile-filter-toggle {
+    display: flex;
+  }
+
+  /* Контролы скрыты по умолчанию, показываются по клику */
+  .header-controls {
+    display: none;
+    width: 100%;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 6px;
+    padding-top: 4px;
+    border-top: 1px solid var(--border);
+    margin-top: 2px;
+  }
+
+  .header-controls.mobile-open {
+    display: flex;
+  }
+
+  /* Поиск на всю ширину */
+  .search-wrap {
+    width: 100%;
+  }
+  .search-wrap input {
+    width: 100%;
+    min-width: unset;
+  }
+
+  /* Дропдауны на всю ширину */
+  .ms-wrap {
+    width: 100%;
+  }
+  .ms-trigger {
+    min-width: unset;
+    width: 100%;
+  }
+  .ms-dropdown {
+    min-width: unset;
+    max-width: unset;
+    width: 100%;
+    left: 0;
+    right: 0;
+  }
+
+  /* Кнопка "Сегодня" — полная ширина */
+  .goto-today-btn {
+    width: 100%;
+    text-align: center;
+    padding: 9px 12px;
+  }
+
+  /* Бейдж с датой — полная ширина */
+  .today-badge {
+    width: 100%;
+    text-align: center;
+  }
+
+  /* --- Stats: 2 колонки --- */
+  .stats {
+    grid-template-columns: 1fr 1fr;
+    padding: 10px 12px 4px;
+    gap: 8px;
+  }
+
+  .stat-card {
+    padding: 10px 12px;
+    border-radius: 10px;
+  }
+
+  .stat-value {
+    font-size: 22px;
+  }
+
+  /* --- Legend: компактнее --- */
+  .legend {
+    padding: 6px 12px;
+    gap: 8px;
+  }
+
+  .legend-lbl {
+    width: 100%;
+    margin-bottom: 2px;
+  }
+
+  /* --- Gantt левая панель: уже --- */
+  .gantt-left {
+    width: 200px;
+    min-width: 200px;
+  }
+
+  .gantt-header-cell {
+    font-size: 10px;
+    padding: 0 8px;
+    height: 44px;
+  }
+
+  .task-row {
+    height: 40px;
+    padding: 0 8px;
+    gap: 4px;
+  }
+
+  .task-row.dk-row {
+    font-size: 11px;
+  }
+
+  .task-row.stage-row {
+    padding-left: 14px;
+    font-size: 11px;
+  }
+
+  .task-row.task-row-item {
+    padding-left: 20px;
+    font-size: 11px;
+  }
+
+  /* Скрываем второстепенные элементы на мобильном */
+  .days-left {
+    display: none;
+  }
+
+  .subdiv-tag {
+    display: none;
+  }
+
+  /* Ответственный — скрываем (он рендерится inline стилем) */
+  .task-row [style*="font-size:9px"] {
+    display: none;
+  }
+
+  /* Статусные пиллюли — укороченные */
+  .status-pill {
+    font-size: 9px;
+    padding: 1px 4px;
+  }
+
+  /* Gantt строки — выше такая же высота */
+  .gantt-chart-row {
+    height: 40px;
+  }
+
+  .bar {
+    top: 7px;
+    height: 26px;
+  }
+
+  .bar-comment,
+  .bar-closing-doc {
+    display: none; /* на узком экране скрываем — всё равно не видно */
+  }
+
+  /* Timeline header */
+  .gantt-timeline-header {
+    height: 44px;
+  }
+
+  .month-label {
+    font-size: 9px;
+  }
+
+  .day-label {
+    font-size: 9px;
+  }
+
+  /* Тултип — не фиксированный на мобильном, а внизу экрана */
+  .tooltip {
+    position: fixed;
+    left: 8px !important;
+    right: 8px !important;
+    bottom: 8px !important;
+    top: auto !important;
+    max-width: unset;
+    width: auto;
+    border-radius: 16px;
+    padding: 14px 16px;
+    pointer-events: auto;
+  }
+
+  /* Loading / Empty */
+  .loading-state {
+    padding: 40px 20px;
+  }
+
+  .empty-state {
+    padding: 50px 20px;
+  }
+}
+
+/* ═══════════════════════════════════
+   VERY SMALL SCREENS (≤ 480px)
+═══════════════════════════════════ */
+@media (max-width: 480px) {
+  .gantt-left {
+    width: 160px;
+    min-width: 160px;
+  }
+
+  .row-label {
+    font-size: 10px;
+  }
+
+  .stats {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .stat-value {
+    font-size: 20px;
+  }
+
+  .stat-title {
+    font-size: 10px;
+  }
+
+  /* Легенду сворачиваем — только точки без текста */
+  .legend-item span:not(.legend-dot):not(.legend-swatch):not(.legend-line-swatch) {
+    display: none;
+  }
+}
 </style>
 </head>
 <body>
 
 <div class="header">
   <div class="logo">Консолидированный календарь<span> Дорожных карт</span></div>
-  <div class="header-controls">
+  <!-- Кнопка-тоггл (только на мобильном) -->
+  <button class="mobile-filter-toggle" id="mobileFilterToggle" onclick="toggleMobileFilters()">
+    🔧 Фильтры <span class="filter-count" id="mobileFilterCount" style="display:none"></span>
+  </button>
+  <div class="header-controls" id="headerControls">
     <div class="search-wrap">
       <span class="search-icon">🔍</span>
       <input type="text" id="searchInput" placeholder="Поиск…" oninput="renderGantt()">
@@ -253,6 +506,24 @@ body{font-family:'Geologica',sans-serif;background:var(--bg);color:var(--text);m
 <div class="tooltip" id="tooltip"></div>
 
 <script>
+// ── MOBILE FILTER TOGGLE ──
+function toggleMobileFilters() {
+  const controls = document.getElementById('headerControls');
+  controls.classList.toggle('mobile-open');
+  const btn = document.getElementById('mobileFilterToggle');
+  btn.textContent = controls.classList.contains('mobile-open') ? '✕ Закрыть' : '🔧 Фильтры';
+  // восстановить счётчик
+  const countEl = document.getElementById('mobileFilterCount');
+  if (!controls.classList.contains('mobile-open') && countEl.style.display !== 'none') {
+    btn.innerHTML = '🔧 Фильтры <span class="filter-count" id="mobileFilterCount">' + countEl.textContent + '</span>';
+  }
+}
+
+// Тултип на мобильном — закрывать по тапу
+document.getElementById('tooltip').addEventListener('click', function() {
+  this.style.display = 'none';
+});
+
 // ═══════════════════════════════════════════════════
 //  MULTISELECT WIDGET
 // ═══════════════════════════════════════════════════
@@ -300,7 +571,6 @@ class MultiSelect {
   }
   _toggle() {
     const open = this.dropdown.classList.contains('open');
-    // close all others
     document.querySelectorAll('.ms-dropdown.open').forEach(d => d.classList.remove('open'));
     document.querySelectorAll('.ms-trigger.open').forEach(t => t.classList.remove('open'));
     if (!open) { this.dropdown.classList.add('open'); this.trigger.classList.add('open'); this._searchEl.focus(); }
@@ -332,9 +602,9 @@ class MultiSelect {
       if (!badge) { badge = document.createElement('span'); badge.className = 'ms-badge'; this.trigger.insertBefore(badge, this.trigger.querySelector('.ms-arrow')); }
       badge.textContent = n;
     }
+    updateMobileFilterCount();
   }
   setItems(items) {
-    // keep valid selections
     this.selected = new Set([...this.selected].filter(v => items.includes(v)));
     this.allItems = items;
     this._renderList('');
@@ -342,6 +612,16 @@ class MultiSelect {
   }
   getSelected() { return this.selected; }
   clear() { this.selected.clear(); this._renderList(''); this._updateTrigger(); }
+}
+
+function updateMobileFilterCount() {
+  const total = [msSubdiv, msDK, msStage, msStatus, msAssign]
+    .filter(Boolean)
+    .reduce((sum, ms) => sum + ms.getSelected().size, 0);
+  const countEl = document.getElementById('mobileFilterCount');
+  if (!countEl) return;
+  if (total > 0) { countEl.textContent = total; countEl.style.display = ''; }
+  else { countEl.style.display = 'none'; }
 }
 
 // ═══════════════════════════════════════════════════
@@ -475,7 +755,6 @@ function initFilters() {
   msStatus = new MultiSelect('msStatus','Статус', onFilterChange);
   msAssign = new MultiSelect('msAssign','Ответственный', onFilterChange);
 
-  // status items fixed
   msStatus.setItems(['✅ Выполнено','🔄 В работе','📋 План','⚠️ Выполнено с просрочкой','🔴 Просрочено (не завершены)']);
   refreshDependentFilters();
 }
@@ -486,23 +765,19 @@ function refreshDependentFilters() {
   const selSubdivs = msSubdiv ? msSubdiv.getSelected() : new Set();
   const selDKs     = msDK     ? msDK.getSelected()     : new Set();
 
-  // Подразделения — все уникальные из всех задач
   const allSubdivs = [...new Set(allData.flatMap(r=>r.subdivs).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'ru'));
   msSubdiv && msSubdiv.setItems(allSubdivs);
 
-  // ДК — фильтруем по подразделению если выбрано
   let forDK = allData;
   if (selSubdivs.size) forDK = forDK.filter(r=>r.subdivs.some(s=>selSubdivs.has(s)));
   const dkList = [...new Set(forDK.map(r=>r.dk).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'ru'));
   msDK && msDK.setItems(dkList);
 
-  // Этапы — фильтруем по подразделению + ДК
   let forStage = forDK;
   if (selDKs.size) forStage = forStage.filter(r=>selDKs.has(r.dk));
   const stageList = [...new Set(forStage.map(r=>r.stage).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'ru'));
   msStage && msStage.setItems(stageList);
 
-  // Ответственные
   const assigneeSet = new Set();
   allData.forEach(r=>r.assignees.forEach(a=>{ if(a) assigneeSet.add(a); }));
   const assigneeList = [...assigneeSet].sort((a,b)=>a.localeCompare(b,'ru'));
@@ -528,7 +803,6 @@ function getFiltered() {
   const selAssigns = msAssign ? msAssign.getSelected() : new Set();
   const search = document.getElementById('searchInput').value.trim().toLowerCase();
 
-  // map status labels to keys
   const statusKeys = new Set([...selStatuses].map(l=>STATUS_LABEL_TO_KEY[l]).filter(Boolean));
   const wantOverdue = statusKeys.has('__overdue__');
 
@@ -592,7 +866,8 @@ function scrollToToday() {
   const outer=document.getElementById('ganttScrollOuter'); if(!outer) return;
   const off=daysBetween(gMinDate,today);
   const px=off*DAY_W+DAY_W/2;
-  outer.scrollLeft=Math.max(0, px-(outer.clientWidth-560)/2);
+  const leftW = window.innerWidth <= 480 ? 160 : window.innerWidth <= 768 ? 200 : 560;
+  outer.scrollLeft=Math.max(0, px-(outer.clientWidth-leftW)/2);
 }
 
 // ═══════════════════════════════════════════════════
@@ -648,7 +923,6 @@ function renderGantt() {
   });
 
   meta.forEach(({lRow,rRow,node,level},i)=>{
-    // grid
     for (let d=0;d<totalDays;d++) {
       const date=new Date(minDate.getTime()+d*86400000), dow=date.getDay();
       const gl=document.createElement('div'); gl.className='grid-line'; gl.style.left=(d*DAY_W)+'px';
@@ -661,7 +935,6 @@ function renderGantt() {
       tl.style.left=(todayOff*DAY_W+DAY_W/2)+'px'; rRow.appendChild(tl);
     }
 
-    // bar
     if (node.start&&node.end) {
       const sOff=Math.max(0,daysBetween(minDate,node.start));
       const eOff=daysBetween(minDate,node.end);
@@ -679,9 +952,13 @@ function renderGantt() {
 
       bar.style.left=bL+'px'; bar.style.width=bW+'px';
       if (level>=1) { const bl=document.createElement('div'); bl.className='bar-label'; bl.textContent=node.name; bar.appendChild(bl); }
+
+      // На мобильном — тап открывает тултип
       bar.addEventListener('mouseenter',e=>showTip(e,node));
       bar.addEventListener('mousemove', e=>moveTip(e));
       bar.addEventListener('mouseleave',hideTip);
+      bar.addEventListener('touchstart',e=>{ e.preventDefault(); showTipTouch(node); },{passive:false});
+
       rRow.appendChild(bar);
 
       let afterX=bL+bW+8;
@@ -697,7 +974,6 @@ function renderGantt() {
       }
     }
 
-    // left panel
     const hasKids=node.children&&node.children.length>0;
     if (hasKids) {
       const ic=document.createElement('span'); ic.className='collapse-icon'; ic.textContent='▼';
@@ -713,7 +989,6 @@ function renderGantt() {
     const lb=document.createElement('div'); lb.className='row-label'; lb.textContent=node.name; lb.title=node.name;
     lRow.appendChild(lb);
 
-    // subdiv tag on DK rows
     if (level===0&&node.subdiv) {
       const sb=document.createElement('div'); sb.className='subdiv-tag';
       sb.textContent=node.subdiv; sb.title=node.subdiv; lRow.appendChild(sb);
@@ -724,8 +999,9 @@ function renderGantt() {
       const pill=document.createElement('div'); pill.className='status-pill';
       if      (norm==='выполнено'||norm==='исполнено'){pill.classList.add('s-done');    pill.textContent='ГОТОВО';}
       else if (norm==='просрочено_исп')               {pill.classList.add('s-overdue'); pill.textContent='ПР.ИСП.';}
-      else if (norm==='в работе') { ov?pill.classList.add('s-overdue')&&(pill.textContent='ПРОСРОЧ.'):pill.classList.add('s-wip')&&(pill.textContent='В РАБОТЕ');
-        if(ov){pill.classList.add('s-overdue');pill.textContent='ПРОСРОЧ.';}else{pill.classList.add('s-wip');pill.textContent='В РАБОТЕ';} }
+      else if (norm==='в работе') {
+        if(ov){pill.classList.add('s-overdue');pill.textContent='ПРОСРОЧ.';}else{pill.classList.add('s-wip');pill.textContent='В РАБОТЕ';}
+      }
       else { if(ov){pill.classList.add('s-overdue');pill.textContent='ПРОСРОЧ.';}else{pill.classList.add('s-plan');pill.textContent='ПЛАН';} }
       lRow.appendChild(pill);
 
@@ -772,7 +1048,8 @@ function buildTimelineHeader(container,minDate,totalDays) {
 //  TOOLTIP
 // ═══════════════════════════════════════════════════
 const tipEl=document.getElementById('tooltip');
-function showTip(e,node) {
+
+function buildTipHtml(node) {
   const norm=node.status||'', dL=node.end?Math.ceil((node.end-today)/86400000):null;
   let stHtml='';
   if (norm==='выполнено'||norm==='исполнено') stHtml=`<span style="color:var(--done)">● Выполнено</span>`;
@@ -786,7 +1063,7 @@ function showTip(e,node) {
     else if (dL<0) dHtml=`<span style="color:var(--overdue)">Просрочено на ${Math.abs(dL)} дн.</span>`;
     else dHtml=`<span style="color:var(--done)">Осталось ${dL} дн.</span>`;
   }
-  tipEl.innerHTML=`
+  return `
     <h4>${node.name}</h4>
     ${node.subdiv?`<div class="tooltip-row"><span class="tooltip-key">Подразделение</span><span class="tooltip-val">${node.subdiv}</span></div>`:''}
     <div class="tooltip-row"><span class="tooltip-key">Статус</span><span class="tooltip-val">${stHtml}</span></div>
@@ -797,7 +1074,15 @@ function showTip(e,node) {
     ${node.completedDate?`<div class="tooltip-row"><span class="tooltip-key">Дата исполнения</span><span class="tooltip-val" style="color:${node.status==='исполнено'?'var(--done)':'var(--overdue)'};">${fmtDate(node.completedDate)}</span></div>`:''}
     ${node.result?`<div class="tooltip-block result">📄 <span><b>Закрывающий документ:</b><br>${node.result}</span></div>`:''}
     ${node.comment?`<div class="tooltip-block comment">💬 <span><b>Комментарий:</b><br>${node.comment}</span></div>`:''}`;
+}
+
+function showTip(e,node) {
+  tipEl.innerHTML = buildTipHtml(node);
   tipEl.style.display='block'; moveTip(e);
+}
+function showTipTouch(node) {
+  tipEl.innerHTML = buildTipHtml(node) + `<div style="text-align:center;margin-top:10px;font-size:11px;color:var(--text3)">Нажмите для закрытия</div>`;
+  tipEl.style.display='block';
 }
 function moveTip(e){
   tipEl.style.left=Math.min(e.clientX+14,window.innerWidth-tipEl.offsetWidth-8)+'px';
