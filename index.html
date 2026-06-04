@@ -1022,6 +1022,12 @@ function renderGantt() {
       }
     }
 
+    // Тултип на строках левой панели
+    lRow.addEventListener('mouseenter', e => showTip(e, node));
+    lRow.addEventListener('mousemove',  e => moveTip(e));
+    lRow.addEventListener('mouseleave', hideTip);
+    lRow.addEventListener('touchstart', e => { e.preventDefault(); showTipTouch(node); }, {passive:false});
+
     leftPanel.appendChild(lRow); rightPanel.appendChild(rRow);
   });
 
